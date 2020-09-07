@@ -8,11 +8,11 @@ import {
 } from "../../deps.ts";
 
 import { DiscordStructure, SocketEvent, SocketData, SocketHello } from "./mod.ts";
-import { TypedEmitter } from "../typings/mod.ts";
+import { SomeObject, TypedEmitter } from "../typings/mod.ts";
 
 export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 {
-	public socket?: WebSocket;
+	private socket?: WebSocket;
 	public lastSequence: number | null = null;
 	public sessionId?: string;
 	private heartbeatInterval?: number;
@@ -23,6 +23,14 @@ export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 		super();
 		this.gateway += "?v=6&encoding=json";
 		this.setup();
+	}
+
+	public send(opcode: number, data: SomeObject)
+	{
+		this.socket?.send(JSON.stringify({
+			op: opcode,
+			d: data
+		}));
 	}
 
 	private async setup(resuming?: boolean)
@@ -66,29 +74,23 @@ export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 
 	private resume()
 	{
-		this.socket?.send(JSON.stringify({
-			"op": 6,
-			"d": {
-				"token": this.token,
-				"session_id": this.sessionId,
-				"seq": this.lastSequence
-			}
-		}));
+		this.send(6, {
+			token: this.token,
+			session_id: this.sessionId,
+			seq: this.lastSequence
+		});
 	}
 
 	private authenticate()
 	{
-		this.socket?.send(JSON.stringify({
-			"op": 2,
-			"d": {
-				"token": this.token,
-				"properties": {
-					"$os": platform,
-					"$browser": AGENT,
-					"$device": AGENT
-				}
+		this.send(2, {
+			token: this.token,
+			properties: {
+				$os: platform,
+				$browser: AGENT,
+				$device: AGENT
 			}
-		}));
+		});
 	}
 
 	private async switchOpCode(data: SocketData)

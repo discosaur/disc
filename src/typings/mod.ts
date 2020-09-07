@@ -11,3 +11,5 @@ export * from "./UserModels.ts";
 export * from "./Misc.ts";
 
 export * from "./TypedEmitter.ts";
+
+export * from "./MessageModel.ts";

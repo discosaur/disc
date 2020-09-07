@@ -1,7 +1,5 @@
 import { RestClient as Rest } from "./RestClient.ts"
-import {
-	ICreateMessage
-} from "../../deps.ts";
+import { ICreateMessage, SomeObject } from "../typings/mod.ts";
 
 export class Channel
 {
@@ -23,9 +21,9 @@ export class Channel
 		return this._rest.get(this.route);
 	}
 
-	public Modify(opts: unknown): Promise<unknown>
+	public Modify(): Promise<unknown>
 	{
-		return this._rest.get(this.route, opts);
+		return this._rest.get(this.route);
 	}
 
 	public Delete(): Promise<unknown>
@@ -52,7 +50,7 @@ export class Channel
 		return this._rest.post(`${this.route}/messages`, opts);
 	}
 	
-	public EditMessage(msgId: string, opts: unknown): Promise<unknown>
+	public EditMessage(msgId: string, opts: SomeObject): Promise<unknown>
 	{
 		return this._rest.patch(`${this.route}/messages/${msgId}`, opts);
 	}
@@ -101,9 +99,9 @@ export class Channel
 		return this._rest.delete(`${this.route}/messages/${msgId}/reactions/${emoji}/${userId}`);
 	}
 
-	public GetReactions(msgId: string, emoji: unknown, query?: unknown): Promise<unknown>
+	public GetReactions(msgId: string, emoji: unknown): Promise<unknown>
 	{
-		return this._rest.get(`${this.route}/messages/${msgId}/reactions/${emoji}`, query);
+		return this._rest.get(`${this.route}/messages/${msgId}/reactions/${emoji}`);
 	}
 
 	public DeleteAllReactions(msgId: string): Promise<void>
@@ -118,9 +116,9 @@ export class Channel
 	//#endregion
 
 	//#region Invites
-	public CreateInvite(opts?: unknown): Promise<unknown>
+	public CreateInvite(opts?: SomeObject): Promise<unknown>
 	{
-		return this._rest.post(`${this.route}/invites`, opts ?? {});
+		return this._rest.post(`${this.route}/invites`, opts);
 	}
 
 	public GetInvites(): Promise<unknown[]>
@@ -130,12 +128,12 @@ export class Channel
 	//#endregion
 
 	//#region Permissions
-	public CreatePermissions(overrideId: string, opts: unknown): Promise<void>
+	public CreatePermissions(overrideId: string, opts: SomeObject): Promise<void>
 	{
 		return this._rest.put(`${this.route}/permissions/${overrideId}`, opts);
 	}
 	
-	public EditPermissions(overrideId: string, opts: unknown): Promise<void>
+	public EditPermissions(overrideId: string, opts: SomeObject): Promise<void>
 	{
 		return this._rest.put(`${this.route}/permissions/${overrideId}`, opts);
 	}
@@ -162,7 +160,7 @@ export class GroupChannel extends Channel
 	}
 	
 	//#region Group DM options
-	public GroupDmAddRecipient(id: string, opts?: unknown): Promise<void>
+	public GroupDmAddRecipient(id: string, opts?: SomeObject): Promise<void>
 	{
 		return this._rest.put(`${this.route}/recipients/${id}`, opts);
 	}
