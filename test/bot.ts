@@ -23,6 +23,4 @@ ws.on("READY", async (data: RawReadyData) =>
 		yellow(`Guild count: ${green(String(data.guilds.length))}`),
 		red("=".repeat(50)),
 	].join("\n"));
-
-	await rest.get(`guilds/${data.guilds[0].id}`);
 });
