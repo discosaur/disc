@@ -5,7 +5,7 @@ export interface IBaseChannel
 	type: ChannelType
 }
 
-export interface IBaseGuildChannel
+export interface IBaseGuildChannel extends IBaseChannel
 {
 	guild_id: string,
 	name: string,
@@ -34,7 +34,7 @@ export interface IDmChannel
 	recipients: IDmChannelRecipient[]
 }
 
-interface IDmGroupChannel extends IDmChannel
+export interface IDmGroupChannel extends IDmChannel
 {
 	name: string;
 	icon?: unknown | null;

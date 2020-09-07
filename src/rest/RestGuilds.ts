@@ -71,9 +71,18 @@ class Guild
 	//#endregion
 
 	//#region Channels
-	public GetChannels()
+	public GetChannels(): Promise<unknown[]>
 	{
 		return this._rest.get(this.route + "/channels");
+	}
+
+	public ModifyChannels(id: string, opts: {
+		name?: string,
+		type: "TEXT" | "NEWS",
+		position: number
+	})
+	{
+		return this._rest.patch(`${this.route}/channels/${id}`, opts);
 	}
 
 	public ReorderChannels(opts: SomeObject)
