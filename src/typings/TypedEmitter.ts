@@ -8,16 +8,14 @@ listener: GenericFunction;
  * See also https://nodejs.org/api/events.html
  */
 export default class TypedEmitter<E extends string | symbol, D>
-	{
+{
 	public static defaultMaxListeners = 10;
 	public static errorMonitor = Symbol("events.errorMonitor");
 	private maxListeners: number | undefined;
-	private _events: Map<
-		E,
-		Array<GenericFunction | WrappedFunction>
-	>;
+	private _events: Map<E, Array<GenericFunction | WrappedFunction>>;
 
-	public constructor() {
+	constructor()
+	{
 		this._events = new Map();
 	}
 
@@ -25,30 +23,30 @@ export default class TypedEmitter<E extends string | symbol, D>
 		eventName: E,
 		listener: GenericFunction | WrappedFunction,
 		prepend: boolean,
-	): this {
-		if (this._events.has(eventName)) {
-		const listeners = this._events.get(eventName) as Array<
-			GenericFunction | WrappedFunction
-		>;
-		if (prepend) {
-			listeners.unshift(listener);
-		} else {
-			listeners.push(listener);
+	): this
+	{
+		if (this._events.has(eventName))
+		{
+			const listeners = this._events.get(eventName) as Array<GenericFunction | WrappedFunction>;
+			if (prepend)
+				listeners.unshift(listener);
+			else
+				listeners.push(listener);
 		}
-		} else {
-		this._events.set(eventName, [listener]);
-		}
-		const max = this.getMaxListeners();
-		if (max > 0 && this.listenerCount(eventName) > max) {
-		const warning = new Error(
-			`Possible TypedEmitter memory leak detected.
-			${this.listenerCount(eventName)} ${eventName.toString()} listeners.
-			Use emitter.setMaxListeners() to increase limit`,
-		);
-		warning.name = "MaxListenersExceededWarning";
-		console.warn(warning);
-		}
+		else
+			this._events.set(eventName, [listener]);
 
+		const max = this.getMaxListeners();
+		if (max > 0 && this.listenerCount(eventName) > max)
+		{
+			const warning = new Error(
+				`Possible TypedEmitter memory leak detected.
+				${this.listenerCount(eventName)} ${eventName.toString()} listeners.
+				Use emitter.setMaxListeners() to increase limit`,
+			);
+			warning.name = "MaxListenersExceededWarning";
+			console.warn(warning);
+		}
 		return this;
 	}
 
@@ -56,7 +54,8 @@ export default class TypedEmitter<E extends string | symbol, D>
 	public addListener(
 		eventName: E,
 		listener: GenericFunction | WrappedFunction,
-	): this {
+	): this
+	{
 		return this._addListener(eventName, listener, false);
 	}
 
@@ -67,31 +66,39 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 * @return true if the event had listeners, false otherwise
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	public emit(eventName: E, ...args: D[]): boolean {
-		if (this._events.has(eventName)) {
-		if (
-			eventName === "error" &&
-			this._events.get(TypedEmitter.errorMonitor as E)
-		) {
-			this.emit(TypedEmitter.errorMonitor as E, ...args);
-		}
-		const listeners = (this._events.get(
-			eventName,
-		) as GenericFunction[]).slice(); // We copy with slice() so array is not mutated during emit
-		for (const listener of listeners) {
-			try {
-			listener.apply(this, args);
-			} catch (err) {
-			this.emit("error" as E, err);
+	public emit(eventName: E, ...args: D[]): boolean
+	{
+		if (this._events.has(eventName))
+		{
+			if (
+				eventName === "error" &&
+				this._events.get(TypedEmitter.errorMonitor as E)
+			)
+			{
+				this.emit(TypedEmitter.errorMonitor as E, ...args);
 			}
-		}
+			const listeners = (this._events.get(
+				eventName,
+			) as GenericFunction[]).slice(); // We copy with slice() so array is not mutated during emit
+			for (const listener of listeners)
+			{
+				try
+				{
+				listener.apply(this, args);
+				}
+				catch (err)
+				{
+				this.emit("error" as E, err);
+				}
+			}
 		return true;
-		} else if (eventName === "error") {
-		if (this._events.get(TypedEmitter.errorMonitor as E)) {
-			this.emit(TypedEmitter.errorMonitor as E, ...args);
 		}
-		const errMsg = args.length > 0 ? args[0] : Error("Unhandled error.");
-		throw errMsg;
+		else if (eventName === "error")
+		{
+			if (this._events.get(TypedEmitter.errorMonitor as E))
+				this.emit(TypedEmitter.errorMonitor as E, ...args);
+			const errMsg = args.length > 0 ? args[0] : Error("Unhandled error.");
+			throw errMsg;
 		}
 		return false;
 	}
@@ -100,7 +107,8 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 * Returns an array listing the events for which the emitter has
 	 * registered listeners.
 	 */
-	public eventNames(): [E] {
+	public eventNames(): [E]
+	{
 		return Array.from(this._events.keys()) as [E];
 	}
 
@@ -109,7 +117,8 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 * either set by emitter.setMaxListeners(n) or defaults to
 	 * TypedEmitter.defaultMaxListeners.
 	 */
-	public getMaxListeners(): number {
+	public getMaxListeners(): number
+	{
 		return this.maxListeners || TypedEmitter.defaultMaxListeners;
 	}
 
@@ -117,40 +126,46 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 * Returns the number of listeners listening to the event named
 	 * eventName.
 	 */
-	public listenerCount(eventName: E): number {
-		if (this._events.has(eventName)) {
-		return (this._events.get(eventName) as GenericFunction[]).length;
-		} else {
-		return 0;
+	public listenerCount(eventName: E): number
+	{
+		if (this._events.has(eventName))
+		{
+			return (this._events.get(eventName) as GenericFunction[]).length;
 		}
+		else
+			return 0;
 	}
 
 	private _listeners(
 		target: TypedEmitter<string, unknown>,
 		eventName: E,
 		unwrap: boolean,
-	): GenericFunction[] {
-		if (!target._events.has(eventName as string)) {
-		return [];
-		}
+	): GenericFunction[]
+	{
+		if (!target._events.has(eventName as string))
+			return [];
+
 		const eventListeners = target._events.get(eventName as string) as GenericFunction[];
 
 		return unwrap
-		? this.unwrapListeners(eventListeners)
-		: eventListeners.slice(0);
+			? this.unwrapListeners(eventListeners)
+			: eventListeners.slice(0);
 	}
 
-	private unwrapListeners(arr: GenericFunction[]): GenericFunction[] {
+	private unwrapListeners(arr: GenericFunction[]): GenericFunction[]
+	{
 		const unwrappedListeners = new Array(arr.length) as GenericFunction[];
-		for (let i = 0; i < arr.length; i++) {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		unwrappedListeners[i] = (arr[i] as any)["listener"] || arr[i];
+		for (let i = 0; i < arr.length; i++)
+		{
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			unwrappedListeners[i] = (arr[i] as any)["listener"] || arr[i];
 		}
 		return unwrappedListeners;
 	}
 
 	/** Returns a copy of the array of listeners for the event named eventName.*/
-	public listeners(eventName: E): GenericFunction[] {
+	public listeners(eventName: E): GenericFunction[]
+	{
 		return this._listeners(this as TypedEmitter<string, unknown>, eventName, true);
 	}
 
@@ -160,12 +175,14 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 */
 	public rawListeners(
 		eventName: E,
-	): Array<GenericFunction | WrappedFunction> {
+	): Array<GenericFunction | WrappedFunction>
+	{
 		return this._listeners(this as TypedEmitter<string, unknown>, eventName, false);
 	}
 
 	/** Alias for emitter.removeListener(). */
-	public off(eventName: E, listener: GenericFunction): this {
+	public off(eventName: E, listener: GenericFunction): this
+	{
 		return this.removeListener(eventName, listener);
 	}
 
@@ -179,7 +196,8 @@ export default class TypedEmitter<E extends string | symbol, D>
 	public on(
 		eventName: E,
 		listener: GenericFunction | WrappedFunction,
-	): this {
+	): this
+	{
 		return this.addListener(eventName, listener);
 	}
 
@@ -187,7 +205,8 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 * Adds a one-time listener function for the event named eventName. The next
 	 * time eventName is triggered, this listener is removed and then invoked.
 	 */
-	public once(eventName: E, listener: GenericFunction): this {
+	public once(eventName: E, listener: GenericFunction): this
+	{
 		const wrapped: WrappedFunction = this.onceWrap(eventName, listener);
 		this.on(eventName, wrapped);
 		return this;
@@ -197,31 +216,33 @@ export default class TypedEmitter<E extends string | symbol, D>
 	private onceWrap(
 		eventName: E,
 		listener: GenericFunction,
-	): WrappedFunction {
+	): WrappedFunction
+	{
 		const wrapper = function (
-		this: {
-			eventName: E;
-			listener: GenericFunction;
-			rawListener: GenericFunction | WrappedFunction;
-			context: TypedEmitter<string, unknown>;
-		},
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		...args: any[]
-		): void {
-		this.context.removeListener(
-			this.eventName as string,
-			this.rawListener as GenericFunction,
-		);
-		this.listener.apply(this.context, args);
+			this: {
+				eventName: E;
+				listener: GenericFunction;
+				rawListener: GenericFunction | WrappedFunction;
+				context: TypedEmitter<string, unknown>;
+			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			...args: any[]
+		): void
+		{
+			this.context.removeListener(
+				this.eventName as string,
+				this.rawListener as GenericFunction,
+			);
+			this.listener.apply(this.context, args);
 		};
 		const wrapperContext = {
-		eventName: eventName,
-		listener: listener,
-		rawListener: (wrapper as unknown) as WrappedFunction,
-		context: this,
+			eventName: eventName,
+			listener: listener,
+			rawListener: (wrapper as unknown) as WrappedFunction,
+			context: this,
 		};
 		const wrapped = (wrapper.bind(
-		wrapperContext as { eventName: E; listener: GenericFunction; rawListener: WrappedFunction | GenericFunction; context: TypedEmitter<string, unknown>; },
+			wrapperContext as { eventName: E; listener: GenericFunction; rawListener: WrappedFunction | GenericFunction; context: TypedEmitter<string, unknown>; },
 		) as unknown) as WrappedFunction;
 		wrapperContext.rawListener = wrapped;
 		wrapped.listener = listener;
@@ -238,7 +259,8 @@ export default class TypedEmitter<E extends string | symbol, D>
 	public prependListener(
 		eventName: E,
 		listener: GenericFunction | WrappedFunction,
-	): this {
+	): this
+	{
 		return this._addListener(eventName, listener, true);
 	}
 
@@ -250,32 +272,35 @@ export default class TypedEmitter<E extends string | symbol, D>
 	public prependOnceListener(
 		eventName: E,
 		listener: GenericFunction,
-	): this {
+	): this
+	{
 		const wrapped: WrappedFunction = this.onceWrap(eventName, listener);
 		this.prependListener(eventName, wrapped);
 		return this;
 	}
 
 	/** Removes all listeners, or those of the specified eventName. */
-	public removeAllListeners(eventName?: E): this {
-		if (this._events === undefined) {
-		return this;
+	public removeAllListeners(eventName?: E): this
+	{
+		if (this._events === undefined)
+		{
+			return this;
 		}
 
 		if (eventName) {
-		if (this._events.has(eventName)) {
-			const listeners = (this._events.get(eventName) as Array<
-			GenericFunction | WrappedFunction
-			>).slice(); // Create a copy; We use it AFTER it's deleted.
-			this._events.delete(eventName);
+			if (this._events.has(eventName))
+			{
+				const listeners = (this._events.get(eventName) as Array<GenericFunction | WrappedFunction>).slice(); // Create a copy; We use it AFTER it's deleted.
+				this._events.delete(eventName);
+			}
 		}
-		} else {
-		const eventList: [E] = this.eventNames();
-		eventList.map((value: E) => {
-			this.removeAllListeners(value);
-		});
+		else
+		{
+			const eventList: [E] = this.eventNames();
+			eventList.map((value: E) => {
+				this.removeAllListeners(value);
+			});
 		}
-
 		return this;
 	}
 
@@ -286,32 +311,36 @@ export default class TypedEmitter<E extends string | symbol, D>
 	public removeListener(
 		eventName: E,
 		listener: GenericFunction,
-	): this {
-		if (this._events.has(eventName)) {
-		const arr:
-			| Array<GenericFunction | WrappedFunction>
-			| undefined = this._events.get(eventName);
+	): this
+	{
+		if (this._events.has(eventName))
+		{
+			const arr:
+				| Array<GenericFunction | WrappedFunction>
+				| undefined = this._events.get(eventName);
 
-		assert(arr);
+			assert(arr);
 
-		let listenerIndex = -1;
-		for (let i = arr.length - 1; i >= 0; i--) {
-			// arr[i]["listener"] is the reference to the listener inside a bound 'once' wrapper
-			if (
-			arr[i] == listener ||
-			(arr[i] && (arr[i] as WrappedFunction)["listener"] == listener)
-			) {
-			listenerIndex = i;
-			break;
+			let listenerIndex = -1;
+			for (let i = arr.length - 1; i >= 0; i--)
+			{
+				// arr[i]["listener"] is the reference to the listener inside a bound 'once' wrapper
+				if (
+					arr[i] == listener ||
+					(arr[i] && (arr[i] as WrappedFunction)["listener"] == listener)
+				)
+				{
+					listenerIndex = i;
+					break;
+				}
 			}
-		}
 
-		if (listenerIndex >= 0) {
-			arr.splice(listenerIndex, 1);
-			if (arr.length === 0) {
-			this._events.delete(eventName);
+			if (listenerIndex >= 0)
+			{
+				arr.splice(listenerIndex, 1);
+				if (arr.length === 0)
+					this._events.delete(eventName);
 			}
-		}
 		}
 		return this;
 	}
@@ -324,81 +353,91 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 * modified for this specific TypedEmitter instance. The value can be set to
 	 * Infinity (or 0) to indicate an unlimited number of listeners.
 	 */
-	public setMaxListeners(n: number): this {
-		if (n !== Infinity) {
-		if (n === 0) {
-			n = Infinity;
-		} else {
-			validateIntegerRange(n, "maxListeners", 0);
-		}
+	public setMaxListeners(n: number): this
+	{
+		if (n !== Infinity)
+		{
+			if (n === 0)
+				n = Infinity;
+			else
+				validateIntegerRange(n, "maxListeners", 0);
 		}
 
 		this.maxListeners = n;
 		return this;
 	}
-	}
+}
 
-	export { TypedEmitter };
-	/**
-	 * Creates a Promise that is fulfilled when the TypedEmitter emits the given
-	 * event or that is rejected when the TypedEmitter emits 'error'. The Promise
-	 * will resolve with an array of all the arguments emitted to the given event.
-	 */
-	export function once(
-	emitter: TypedEmitter<string, unknown> | EventTarget,
-	name: string,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	): Promise<any[]> {
-	return new Promise((resolve, reject) => {
-		if (emitter instanceof EventTarget) {
-		// EventTarget does not have `error` event semantics like Node
-		// TypedEmitters, we do not listen to `error` events here.
-		emitter.addEventListener(
-			name,
-			(...args) => {
-			resolve(args);
-			},
-			{ once: true, passive: false, capture: false },
-		);
-		return;
-		} else if (emitter instanceof TypedEmitter) {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const eventListener = (...args: any[]): void => {
-			if (errorListener !== undefined) {
-			emitter.removeListener("error", errorListener);
-			}
-			resolve(args);
-		};
-		let errorListener: GenericFunction;
-
-		// Adding an error listener is not optional because
-		// if an error is thrown on an event emitter we cannot
-		// guarantee that the actual event we are waiting will
-		// be fired. The result could be a silent way to create
-		// memory or file descriptor leaks, which is something
-		// we should avoid.
-		if (name !== "error") {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			errorListener = (err: any): void => {
-			emitter.removeListener(name, eventListener);
-			reject(err);
-			};
-
-			emitter.once("error", errorListener);
+export { TypedEmitter };
+/**
+ * Creates a Promise that is fulfilled when the TypedEmitter emits the given
+ * event or that is rejected when the TypedEmitter emits 'error'. The Promise
+ * will resolve with an array of all the arguments emitted to the given event.
+ */
+export function once(
+emitter: TypedEmitter<string, unknown> | EventTarget,
+name: string,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any[]>
+{
+	return new Promise((resolve, reject) =>
+	{
+		if (emitter instanceof EventTarget)
+		{
+			// EventTarget does not have `error` event semantics like Node
+			// TypedEmitters, we do not listen to `error` events here.
+			emitter.addEventListener(
+				name,
+				(...args) => {
+				resolve(args);
+				},
+				{ once: true, passive: false, capture: false },
+			);
+			return;
 		}
+		else if (emitter instanceof TypedEmitter)
+		{
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const eventListener = (...args: any[]): void => {
+				if (errorListener !== undefined) {
+				emitter.removeListener("error", errorListener);
+				}
+				resolve(args);
+			};
+			let errorListener: GenericFunction;
+
+			// Adding an error listener is not optional because
+			// if an error is thrown on an event emitter we cannot
+			// guarantee that the actual event we are waiting will
+			// be fired. The result could be a silent way to create
+			// memory or file descriptor leaks, which is something
+			// we should avoid.
+			if (name !== "error")
+			{
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				errorListener = (err: any): void =>
+				{
+					emitter.removeListener(name, eventListener);
+					reject(err);
+				};
+
+				emitter.once("error", errorListener);
+			}
 
 		emitter.once(name, eventListener);
 		return;
 		}
 	});
-	}
+}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	function createIterResult(value: any, done: boolean): IteratorResult<any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createIterResult(value: any, done: boolean): IteratorResult<any>
+{
 	return { value, done };
-	}
+}
 
-	interface AsyncInterable {
+interface AsyncInterable
+{
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	next(): Promise<IteratorResult<any, any>>;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -406,17 +445,17 @@ export default class TypedEmitter<E extends string | symbol, D>
 	throw(err: Error): void;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	[Symbol.asyncIterator](): any;
-	}
-	/**
-	 * Returns an AsyncIterator that iterates eventName events. It will throw if
-	 * the TypedEmitter emits 'error'. It removes all listeners when exiting the
-	 * loop. The value returned by each iteration is an array composed of the
-	 * emitted event arguments.
-	 */
-	export function on<E extends string>(
-	emitter: TypedEmitter<string, unknown>,
-	event: E,
-	): AsyncInterable {
+}
+/**
+ * Returns an AsyncIterator that iterates eventName events. It will throw if
+ * the TypedEmitter emits 'error'. It removes all listeners when exiting the
+ * loop. The value returned by each iteration is an array composed of the
+ * emitted event arguments.
+ */
+export function on<E extends string>(
+emitter: TypedEmitter<string, unknown>,
+event: E,
+): AsyncInterable {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const unconsumedEventValues: any[] = [];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -456,27 +495,29 @@ export default class TypedEmitter<E extends string | symbol, D>
 		},
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		return(): Promise<IteratorResult<any>> {
-		emitter.removeListener(event, eventHandler);
-		emitter.removeListener("error", errorHandler);
-		finished = true;
+		return(): Promise<IteratorResult<any>>
+		{
+			emitter.removeListener(event, eventHandler);
+			emitter.removeListener("error", errorHandler);
+			finished = true;
 
-		for (const promise of unconsumedPromises) {
-			promise.resolve(createIterResult(undefined, true));
-		}
+			for (const promise of unconsumedPromises)
+				promise.resolve(createIterResult(undefined, true));
 
-		return Promise.resolve(createIterResult(undefined, true));
+			return Promise.resolve(createIterResult(undefined, true));
 		},
 
-		throw(err: Error): void {
-		error = err;
-		emitter.removeListener(event, eventHandler);
-		emitter.removeListener("error", errorHandler);
+		throw(err: Error): void
+		{
+			error = err;
+			emitter.removeListener(event, eventHandler);
+			emitter.removeListener("error", errorHandler);
 		},
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		[Symbol.asyncIterator](): any {
-		return this;
+		[Symbol.asyncIterator](): any
+		{
+			return this;
 		},
 	};
 
@@ -486,28 +527,28 @@ export default class TypedEmitter<E extends string | symbol, D>
 	return iterator;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	function eventHandler(...args: any[]): void {
+	function eventHandler(...args: any[]): void
+	{
 		const promise = unconsumedPromises.shift();
-		if (promise) {
-		promise.resolve(createIterResult(args, false));
-		} else {
-		unconsumedEventValues.push(args);
-		}
+		if (promise)
+			promise.resolve(createIterResult(args, false));
+		else
+			unconsumedEventValues.push(args);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	function errorHandler(err: any): void {
+	function errorHandler(err: any): void
+	{
 		finished = true;
 
 		const toError = unconsumedPromises.shift();
-		if (toError) {
+		if (toError)
 		toError.reject(err);
-		} else {
-		// The next time we call next()
-		error = err;
-		}
+		else
+			// The next time we call next()
+			error = err;
 
 		iterator.return();
 	}
-	}
-	export const captureRejectionSymbol = Symbol.for("nodejs.rejection");
+}
+export const captureRejectionSymbol = Symbol.for("nodejs.rejection");

@@ -25,4 +25,4 @@ ws.on("READY", async (data: RawReadyData) =>
 	].join("\n"));
 
 	await rest.get(`guilds/${data.guilds[0].id}`);
-})
+});

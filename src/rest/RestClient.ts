@@ -37,6 +37,7 @@ class RateLimitManager
 		await sleep(timeout);
 	}
 }
+
 export class RestClient
 {
 	private readonly _endpoint: string = "https://discord.com/api/v6/";
@@ -102,15 +103,14 @@ export class RestClient
 		}
 		
 		if (rateLimitInfo["x-ratelimit-remaining"] == 0)
-		{
 			this.manager.set(rateLimitInfo["x-ratelimit-reset-after"] * 1000, baseRoute);
-		}
 
 		if (res.status == 429)
 			console.log(red("oopsie! ratelimits :( WIP"));
 
 		if (res.status >= 400)
 			return { error: res.statusText };
+
 		return res.json();
 	}
 }

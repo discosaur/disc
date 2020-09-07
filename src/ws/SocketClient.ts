@@ -7,7 +7,8 @@ import {
 	red
 } from "../../deps.ts";
 
-import { TypedEmitter, DiscordStructure, SocketEvent, SocketData, SocketHello } from "./mod.ts";
+import { DiscordStructure, SocketEvent, SocketData, SocketHello } from "./mod.ts";
+import { TypedEmitter } from "../typings/mod.ts";
 
 export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 {
@@ -17,7 +18,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 	private heartbeatInterval?: number;
 	private heartbeatAcknowledged = true;
 
-	constructor(public readonly token: string, public readonly gateway: string)
+	constructor(private readonly token: string, public readonly gateway: string)
 	{
 		super();
 		this.gateway += "?v=6&encoding=json";
