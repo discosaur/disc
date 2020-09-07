@@ -1,6 +1,6 @@
 import {
 	platform,
-	clientAgentString,
+	AGENT,
 	connectWebSocket,
 	isWebSocketCloseEvent,
 	WebSocket,
@@ -83,8 +83,8 @@ export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 				"token": this.token,
 				"properties": {
 					"$os": platform,
-					"$browser": clientAgentString,
-					"$device": clientAgentString
+					"$browser": AGENT,
+					"$device": AGENT
 				}
 			}
 		}));

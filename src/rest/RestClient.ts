@@ -1,5 +1,6 @@
-import { clientAgentString, red } from "../../deps.ts";
+import { AGENT, red } from "../../deps.ts";
 import { SomeObject } from "../typings/mod.ts";
+
 class RateLimitManager
 {
 	public queues = new Map<string, Queue>()
@@ -32,23 +33,24 @@ class RateLimitManager
 			return;
 		}
 
-		console.log(`Sleeping ${timeout}ms to avoid ratelimits`);
+		console.log(`Sleeping ${timeout}ms to prevent ratelimiting`);
 		await sleep(timeout);
-		console.log("sleep over");
 	}
 }
 export class RestClient
 {
-	private readonly _discordEndpoint: string = "https://discord.com/api/v6/";
-	private headers: Record<string, string> = {};
+	private readonly _endpoint: string = "https://discord.com/api/v6/";
+	private headers: Record<string, string>;
 	private manager = new RateLimitManager()
 
 	constructor(token: string)
 	{
-		this.headers["Authorization"] = "Bot " + token;
-		this.headers["Content-Type"] = "application/json";
-		this.headers["User-Agent"] = clientAgentString;
-		this.headers["X-RateLimit-Precision"] = "millisecond";
+		this.headers = {
+			"Authorization": "Bot " + token,
+			"Content-Type": "application/json",
+			"User-Agent": AGENT,
+			"X-RateLimit-Precision": "millisecond"
+		}
 	}
 	
 	public get(path: string)
@@ -83,7 +85,7 @@ export class RestClient
 	
 		await this.manager.okay(baseRoute);
 
-		const res = await fetch(this._discordEndpoint + path, {
+		const res = await fetch(this._endpoint + path, {
 			headers: this.headers,
 			method: method,
 			body: JSON.stringify(body)
@@ -114,13 +116,13 @@ export class RestClient
 }
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-//type RequestBody = string | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | ReadableStream<Uint8Array> | null | undefined;
 
 interface Queue
 {
 	okay: boolean
 	okayWhen: number
 }
+
 interface RateLimitHeaders
 {
 	"x-ratelimit-remaining": number
