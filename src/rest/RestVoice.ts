@@ -1,5 +1,5 @@
 import { RestClient } from "./RestClient.ts";
-import { IBaseGuildMe, IPatchUserMe, IConnection, IGetUserMe, SomeObject } from "../typings/mod.ts";
+import { IBaseGuildMe, IPatchClientUser, IConnection, IGetClientUser, SomeObject } from "../typings/mod.ts";
 
 export class RestVoice
 {

@@ -8,7 +8,7 @@ export interface IGetUser
 	public_flags: number
 }
 
-export interface IGetUserMe extends IGetUser
+export interface IGetClientUser extends IGetUser
 {
 	flags: number,
 	bot: boolean,
@@ -18,7 +18,7 @@ export interface IGetUserMe extends IGetUser
 	mfa_enabled: boolean
 }
 
-export interface IPatchUserMe
+export interface IPatchClientUser
 {
 	username?: string,
 	avatar?: unknown

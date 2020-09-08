@@ -1,5 +1,5 @@
 import { RestClient } from "./RestClient.ts";
-import { IBaseGuildMe, IPatchUserMe, IConnection, IGetUserMe, SomeObject } from "../typings/mod.ts";
+import { IBaseGuildMe, IPatchClientUser, IConnection, IGetClientUser, SomeObject } from "../typings/mod.ts";
 
 export class RestUser
 {
@@ -33,13 +33,13 @@ export class RestMeUser
 	}
 
 	//#region General
-	public Get(): Promise<IGetUserMe>
+	public Get(): Promise<IGetClientUser>
 	{
 		return this._rest.get(this.route);
 	}
 
 	// TODO This has may have params
-	public Modify(opts: IPatchUserMe): Promise<IGetUserMe>
+	public Modify(opts: IPatchClientUser): Promise<IGetClientUser>
 	{
 		return this._rest.patch(this.route, opts);
 	}
