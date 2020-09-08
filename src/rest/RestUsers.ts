@@ -1,5 +1,5 @@
 import { RestClient } from "./RestClient.ts";
-import { IBaseGuildMe, IPatchClientUser, IConnection, IGetClientUser, SomeObject } from "../typings/mod.ts";
+import { GuildRes, PatchClientUserReq, ConnectionRes, ClientUserRes, SomeObject } from "../typings/mod.ts";
 
 export class RestUser
 {
@@ -15,7 +15,7 @@ export class RestUser
 		this.route = "users/" + this.id;
 	}
 
-	public Get(): Promise<unknown>
+	public get(): Promise<unknown>
 	{
 		return this._rest.get(this.route);
 	}
@@ -33,13 +33,13 @@ export class RestMeUser
 	}
 
 	//#region General
-	public Get(): Promise<IGetClientUser>
+	public get(): Promise<ClientUserRes>
 	{
 		return this._rest.get(this.route);
 	}
 
 	// TODO This has may have params
-	public Modify(opts: IPatchClientUser): Promise<IGetClientUser>
+	public modify(opts: PatchClientUserReq): Promise<ClientUserRes>
 	{
 		return this._rest.patch(this.route, opts);
 	}
@@ -47,12 +47,12 @@ export class RestMeUser
 	
 	//#region Guilds
 	// TODO This has may have params
-	public GetGuilds(): Promise<IBaseGuildMe>
+	public getGuilds(): Promise<GuildRes>
 	{
 		return this._rest.get(this.route + "/guilds");
 	}
 	
-	public LeaveGuild(id: string): Promise<void>
+	public leaveGuild(id: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/guilds/${id}`);
 	}
@@ -63,24 +63,24 @@ export class RestMeUser
 	 * No longer supported for bots, will return empty array
 	 * [Discord Docs](https://discord.com/developers/docs/resources/user#get-user-dms)
 	 */
-	public GetDmChannels(): Promise<unknown[]>
+	public getDmChannels(): Promise<unknown[]>
 	{
 		return this._rest.get(this.route + "/channels");
 	}
 
-	public CreateDm(opts: string): Promise<unknown>
+	public createDm(opts: string): Promise<unknown>
 	{
 		return this._rest.post(this.route + "/channels", { recipient_id: opts });
 	}
 
-	public CreateGroupDm(opts: SomeObject): Promise<unknown>
+	public createGroupDm(opts: SomeObject): Promise<unknown>
 	{
 		return this._rest.post(this.route + "/channels", opts);
 	}
 	//#endregion
 
 	//#region Misc
-	public GetUserConnections(): Promise<IConnection>
+	public getUserConnections(): Promise<ConnectionRes>
 	{
 		return this._rest.get(this.route + "/connections");
 	}

@@ -1,11 +1,11 @@
-import { IUser } from "./UserModels.ts";
+import { UserRes } from "./mod.ts";
 
-export interface IInvite
+export interface Invite
 {
 	code: string
 	guild: unknown
 	channel: unknown
-	inviter?: IUser
+	inviter?: UserRes
 	target_user?: unknown // partial user
 	target_user_type?: TargetUserTypes
 	approximate_presence_count?: number

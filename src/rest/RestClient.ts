@@ -33,7 +33,6 @@ class RestRateLimitManager
 			return;
 		}
 
-		console.log(`Sleeping ${timeout}ms to prevent ratelimiting`);
 		await sleep(timeout);
 	}
 }
@@ -93,11 +92,11 @@ export class RestClient
 		});
 
 		const rateLimitInfo: RateLimitHeaders = {
-			"x-ratelimit-remaining": Number(res.headers.get("x-ratelimit-remaining")),
-			"x-ratelimit-reset": Number(res.headers.get("x-ratelimit-reset")),
-			"x-ratelimit-reset-after": Number(res.headers.get("x-ratelimit-reset-after")),
-			"x-ratelimit-bucket": res.headers.get("x-ratelimit-bucket") as string,
-			"x-ratelimit-global": res.headers.get("x-ratelimit-global")
+			"x-ratelimit-remaining": 	Number(res.headers.get("x-ratelimit-remaining")),
+			"x-ratelimit-reset": 		Number(res.headers.get("x-ratelimit-reset")),
+			"x-ratelimit-reset-after": 	Number(res.headers.get("x-ratelimit-reset-after")),
+			"x-ratelimit-bucket": 		res.headers.get("x-ratelimit-bucket") as string,
+			"x-ratelimit-global": 		res.headers.get("x-ratelimit-global")
 				? Number(res.headers.get("x-ratelimit-global"))
 				: undefined
 		}
@@ -111,7 +110,10 @@ export class RestClient
 		if (res.status >= 400)
 			return { error: res.statusText };
 
-		return res.json();
+		else if (res.body != null)
+			return res.json();
+
+		else return undefined;
 	}
 }
 

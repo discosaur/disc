@@ -1,5 +1,5 @@
 import { RestClient } from "./RestClient.ts";
-import { IBaseGuildMe, IPatchClientUser, IConnection, IGetClientUser, SomeObject } from "../typings/mod.ts";
+import { GuildRes, PatchClientUserReq, ConnectionRes, ClientUserRes, SomeObject } from "../typings/mod.ts";
 
 export class RestVoice
 {
@@ -13,7 +13,7 @@ export class RestVoice
 		this.route = "voice";
 	}
 
-	public GetRegions(): Promise<unknown[]>
+	public getRegions(): Promise<unknown[]>
 	{
 		return this._rest.get(this.route + "/regions");
 	}

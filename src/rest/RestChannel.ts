@@ -1,33 +1,32 @@
-import { RestClient as Rest } from "./RestClient.ts"
-import { ICreateMessage, SomeObject, anyChannelType, IMessage, IUser } from "../typings/mod.ts";
-import { IInvite } from "../typings/InviteModel.ts";
+import { RestClient } from "./RestClient.ts"
+import { SomeObject, SomeChannel, UserRes, MessageRes, MessageReq, Invite } from "../typings/mod.ts";
 
 export class RestChannel
 {
-	protected readonly _rest: Rest;
+	protected readonly _rest: RestClient;
 
 	public readonly id: string;
 	protected readonly route: string;
 
-	constructor(rClient: Rest, id: string)
+	constructor(rClient: RestClient, id: string)
 	{
 		this._rest = rClient;
 		this.id = id;
-		this.route = "/channels/" + id;
+		this.route = "channels/" + id;
 	}
 
 	//#region General
-	public Get(): Promise<anyChannelType>
+	public get(): Promise<SomeChannel>
 	{
 		return this._rest.get(this.route);
 	}
 
-	public Modify(): Promise<anyChannelType>
+	public modify(): Promise<SomeChannel>
 	{
 		return this._rest.get(this.route);
 	}
 
-	public Delete(): Promise<anyChannelType>
+	public delete(): Promise<SomeChannel>
 	{
 		// yes, it returns channel
 		return this._rest.delete(this.route);
@@ -35,124 +34,124 @@ export class RestChannel
 	//#endregion
 
 	//#region Messages
-	public GetMessages(): Promise<IMessage[]>
+	public getMessages(): Promise<MessageRes[]>
 	{
 		// TODO: query params
 		return this._rest.get(`${this.route}/messages`);
 	}
 
-	public GetMessage(id: string): Promise<IMessage>
+	public getMessage(id: string): Promise<MessageRes>
 	{
 		return this._rest.get(`${this.route}/messages/${id}`);
 	}
 
-	public CreateMessage(opts: ICreateMessage): Promise<IMessage>
+	public createMessage(opts: MessageReq): Promise<MessageRes>
 	{
 		// TODO: WARNING Before using this endpoint, you must connect to and identify with a gateway at least once.
 		return this._rest.post(`${this.route}/messages`, opts);
 	}
 	
-	public EditMessage(msgId: string, opts: SomeObject): Promise<IMessage>
+	public editMessage(msgId: string, opts: SomeObject): Promise<MessageRes>
 	{
 		return this._rest.patch(`${this.route}/messages/${msgId}`, opts);
 	}
 
-	public DeleteMessage(msgId: string): Promise<void>
+	public deleteMessage(msgId: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/messages/${msgId}`);
 	}
 
-	public CrosspostMessage(msgId: string): Promise<IMessage>
+	public crosspostMessage(msgId: string): Promise<MessageRes>
 	{
 		return this._rest.delete(`${this.route}/messages/${msgId}/crosspost`);
 	}
 
-	public BulkDeleteMessages(msgs: string[]): Promise<void>
+	public bulkDeleteMessages(msgs: string[]): Promise<void>
 	{
 		return this._rest.post(`${this.route}/messages/bulk-delete`, { messages: msgs});
 	}
 	//#endregion
 
 	//#region Message Pins
-	public GetPinnedMessages(): Promise<IMessage[]>
+	public getPinnedMessages(): Promise<MessageRes[]>
 	{
 		return this._rest.get(`${this.route}/pins`);
 	}
 
-	public AddPinnedMessage(id: string): Promise<void>
+	public addPinnedMessage(id: string): Promise<void>
 	{
 		return this._rest.put(`${this.route}/pins/${id}`);
 	}
 	
-	public DeletePinnedMessage(id: string): Promise<void>
+	public deletePinnedMessage(id: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/pins/${id}`);
 	}
 	//#endregion
 
 	//#region Reactions
-	public CreateReaction(msgId: string, emoji: unknown): Promise<void>
+	public createReaction(msgId: string, emoji: unknown): Promise<void>
 	{
 		return this._rest.put(`${this.route}/messages/${msgId}/reactions/${emoji}/@me`);
 	}
 
-	public DeleteOwnReaction(msgId: string, emoji: unknown): Promise<void>
+	public deleteOwnReaction(msgId: string, emoji: unknown): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/messages/${msgId}/reactions/${emoji}/@me`);
 	}
 
-	public DeleteUserReaction(msgId: string, emoji: unknown, userId: string): Promise<void>
+	public deleteUserReaction(msgId: string, emoji: unknown, userId: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/messages/${msgId}/reactions/${emoji}/${userId}`);
 	}
 
-	public GetReactions(msgId: string, emoji: unknown): Promise<IUser>
+	public getReactions(msgId: string, emoji: unknown): Promise<UserRes>
 	{
 		return this._rest.get(`${this.route}/messages/${msgId}/reactions/${emoji}`);
 	}
 
-	public DeleteAllReactions(msgId: string): Promise<void>
+	public deleteAllReactions(msgId: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/messages/${msgId}/reactions`);
 	}
 
-	public DeleteAllReactionsForEmoji(msgId: string, emoji: unknown): Promise<void>
+	public deleteAllReactionsForEmoji(msgId: string, emoji: unknown): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/messages/${msgId}/reactions/${emoji}`);
 	}
 	//#endregion
 
 	//#region Invites
-	public CreateInvite(opts?: SomeObject): Promise<IInvite>
+	public createInvite(opts?: SomeObject): Promise<Invite>
 	{
 		return this._rest.post(`${this.route}/invites`, opts);
 	}
 
-	public GetInvites(): Promise<IInvite[]>
+	public getInvites(): Promise<Invite[]>
 	{
 		return this._rest.get(`${this.route}/invites`);
 	}
 	//#endregion
 
 	//#region Permissions
-	public CreatePermissions(overrideId: string, opts: SomeObject): Promise<void>
+	public createPermissions(overrideId: string, opts: SomeObject): Promise<void>
 	{
 		return this._rest.put(`${this.route}/permissions/${overrideId}`, opts);
 	}
 	
-	public EditPermissions(overrideId: string, opts: SomeObject): Promise<void>
+	public editPermissions(overrideId: string, opts: SomeObject): Promise<void>
 	{
 		return this._rest.put(`${this.route}/permissions/${overrideId}`, opts);
 	}
 	
-	public DeletePermissions(overrideId: string): Promise<void>
+	public deletePermissions(overrideId: string): Promise<void>
 	{
 		return this._rest.put(`${this.route}/permissions/${overrideId}`);
 	}
 	//#endregion
 
 	//#region Misc
-	public TriggerTypingIndicator(): Promise<void>
+	public triggerTypingIndicator(): Promise<void>
 	{
 		return this._rest.post(`${this.route}/typing`);
 	}
@@ -161,18 +160,18 @@ export class RestChannel
 
 export class RestGroupChannel extends RestChannel
 {
-	constructor(rClient: Rest, id: string)
+	constructor(rClient: RestClient, id: string)
 	{
 		super(rClient, id);
 	}
 	
 	//#region Group DM options
-	public GroupDmAddRecipient(id: string, opts?: SomeObject): Promise<void>
+	public groupDmAddRecipient(id: string, opts?: SomeObject): Promise<void>
 	{
 		return this._rest.put(`${this.route}/recipients/${id}`, opts);
 	}
 
-	public GroupDmRemoveRecipient(id: string): Promise<void>
+	public groupDmRemoveRecipient(id: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/recipients/${id}`);
 	}

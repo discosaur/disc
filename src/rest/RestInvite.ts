@@ -1,5 +1,5 @@
+import { GuildRes, PatchClientUserReq, ConnectionRes, ClientUserRes, SomeObject } from "../typings/mod.ts";
 import { RestClient } from "./RestClient.ts";
-import { IBaseGuildMe, IPatchClientUser, IConnection, IGetClientUser, SomeObject } from "../typings/mod.ts";
 
 export class RestInvite
 {
@@ -14,12 +14,12 @@ export class RestInvite
 	}
 
 	// code is not a snowflake or id
-	public Get(code: string): Promise<unknown>
+	public get(code: string): Promise<unknown>
 	{
 		return this._rest.get(this.route + code);
 	}
 
-	public Delete(code: string): Promise<unknown>
+	public delete(code: string): Promise<unknown>
 	{
 		return this._rest.delete(this.route + code);
 	}

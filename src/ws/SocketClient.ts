@@ -7,10 +7,10 @@ import {
 	red
 } from "../../deps.ts";
 
-import { DiscordStructure, SocketEvent, SocketData, SocketHello } from "./mod.ts";
+import { SocketEvent, SocketData, SocketHello } from "./mod.ts";
 import { SomeObject, TypedEmitter } from "../typings/mod.ts";
 
-export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
+export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 {
 	private socket?: WebSocket;
 	public lastSequence: number | null = null;
@@ -101,18 +101,16 @@ export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 			case 0:
 				if ((data.d as { session_id?: string }).session_id)
 					this.sessionId = (data.d as { session_id: string }).session_id;
-				this.emit(data.t, data.d as DiscordStructure);
+				this.emit(data.t, data.d);
 				break;
 
 			// Invalidation
 			case 9:
+				try { await this.socket?.close() } catch { }
 				if (data.d)
-				{
-					await this.socket?.close();
 					this.setup(true);
-				}
 				else
-					throw new Error("Unable to resume websocket connection");
+					this.setup();
 				break;
 
 			// Heartbeat request
@@ -123,7 +121,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, DiscordStructure>
 				{
 					if (!this.heartbeatAcknowledged)
 					{
-						this.socket?.close();
+						this.socket?.close().catch();
 						throw new Error(red("No hearbeat Ack received by the discord gateway"));
 					}
 					this.heartbeatAcknowledged = false;

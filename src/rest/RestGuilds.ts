@@ -1,14 +1,14 @@
-import { RestClient } from "./mod.ts";
-import { SomeObject } from "../typings/mod.ts";
 import {
-	IGetGuild,
-	IGuildModify,
-	IEmoji,
-	ICreateEmoji,
-	IModifyEmoji,
-	IGetAuditLogOptions,
-	IAuditLog
+	GuildRes,
+	GuildModifyReq,
+	EmojiRes,
+	CreateEmojiReq,
+	ModifyEmojiReq,
+	AuditLogOptionsReq,
+	AuditLogRes,
+	SomeObject
 } from "../typings/mod.ts";
+import { RestClient } from "./mod.ts";
 
 class RestGuilds
 {
@@ -46,14 +46,14 @@ class RestGuild
 		this.route = "guilds/" + this.id;
 	}
 	//#region General
-	public Get(onlyPreview?: boolean): Promise<IGetGuild>
+	public Get(onlyPreview?: boolean): Promise<GuildRes>
 	{
 		return this._rest.get(onlyPreview == true
 			? this.route + "/preview"
 			: this.route);
 	}
 
-	public Modify(opts: IGuildModify): Promise<IGetGuild>
+	public Modify(opts: GuildModifyReq): Promise<GuildRes>
 	{
 		return this._rest.patch(this.route, opts);
 	}
@@ -86,196 +86,196 @@ class RestGuild
 	//#endregion
 
 	//#region Members
-	public GetMembers()
+	public getMembers()
 	{
 		return this._rest.get(this.route + "/members");
 	}
 
-	public GetMember(id: string)
+	public getMember(id: string)
 	{
 		return this._rest.get(`${this.route}/members/${id}`);
 	}
 
-	public AddMember(id: string, opts: SomeObject)
+	public addMember(id: string, opts: SomeObject)
 	{
 		return this._rest.put(`${this.route}/members/${id}`, opts);
 	}
 
-	public ModifyMember(id: string, opts: SomeObject)
+	public modifyMember(id: string, opts: SomeObject)
 	{
 		return this._rest.patch(`${this.route}/members/${id}`, opts);
 	}
 
-	public RemoveMember(id: string)
+	public removeMember(id: string)
 	{
 		return this._rest.delete(`${this.route}/members/${id}`);
 	}
 
-	public ModifyOwnNick(id: string, nick: string)
+	public modifyOwnNick(id: string, nick: string)
 	{
 		return this._rest.put(`${this.route}/members/@me/nick`, { nick: nick });
 	}
 	//#endregion
 
 	//#region Roles
-	public GetRoles()
+	public getRoles()
 	{
 		return this._rest.get(this.route + "/roles");
 	}
 	
-	public CreateRole()
+	public createRole()
 	{
 		return this._rest.get(this.route + "/roles");
 	}
 	
-	public ReorderRoles(opts: SomeObject)
+	public reorderRoles(opts: SomeObject)
 	{
 		return this._rest.patch(this.route + "/roles", opts);
 	}
 	
-	public ModifyRole(id: string, opts: SomeObject)
+	public modifyRole(id: string, opts: SomeObject)
 	{
 		return this._rest.patch(`${this.route}/roles/${id}`, opts);
 	}
 	
-	public DeleteRole(id: string)
+	public deleteRole(id: string)
 	{
 		return this._rest.delete(`${this.route}/roles/${id}`);
 	}
 
-	public AssignRoleToMember(userId: string, roleId: string)
+	public assignRoleToMember(userId: string, roleId: string)
 	{
 		return this._rest.put(`${this.route}/members/${userId}/roles/${roleId}`);
 	}
 
-	public RemoveRoleFromMember(userId: string, roleId: string)
+	public removeRoleFromMember(userId: string, roleId: string)
 	{
 		return this._rest.delete(`${this.route}/members/${userId}/roles/${roleId}`);
 	}
 	//#endregion
 
 	//#region Bans
-	public GetBans()
+	public getBans()
 	{
 		return this._rest.get(this.route + "bans");
 	}
 
-	public GetBan(id: string)
+	public getBan(id: string)
 	{
 		return this._rest.get(`${this.route}/bans/${id}`);
 	}
 
-	public CreateBan(id: string)
+	public createBan(id: string)
 	{
 		return this._rest.put(`${this.route}/bans/${id}`);
 	}
 	
-	public RemoveBan(id: string)
+	public removeBan(id: string)
 	{
 		return this._rest.delete(`${this.route}/bans/${id}`);
 	}
 	//#endregion
 
 	//#region Prune
-	public GetPruneCount()
+	public getPruneCount()
 	{
 		return this._rest.get(this.route + "/prune");
 	}
 
-	public BeginPrune(opts?: SomeObject)
+	public beginPrune(opts?: SomeObject)
 	{
 		return this._rest.post(this.route + "/prune", opts);
 	}
 	//#endregion
 
 	//#region Integrations
-	public GetIntegrations()
+	public getIntegrations()
 	{
 		return this._rest.get(this.route + "/integrations");
 	}
 
-	public CreateIntegrations(opts: SomeObject)
+	public createIntegrations(opts: SomeObject)
 	{
 		return this._rest.post(this.route + "/integrations", opts);
 	}
 
-	public ModifyIntegrations(id: string, opts: SomeObject)
+	public modifyIntegrations(id: string, opts: SomeObject)
 	{
 		return this._rest.post(`${this.route}/integrations/${id}`, opts);
 	}
 
-	public DeleteIntegrations(id: string)
+	public deleteIntegrations(id: string)
 	{
 		return this._rest.delete(`${this.route}/integrations/${id}`);
 	}
 
-	public SyncIntegrations(id: string)
+	public syncIntegrations(id: string)
 	{
 		return this._rest.post(`${this.route}/integrations/${id}/sync`);
 	}
 	//#endregion
 
 	//#region Widget
-	public GetWidget()
+	public getWidget()
 	{
 		return this._rest.get(this.route + "/widget");
 	}
 
-	public ModifyWidget(opts: SomeObject)
+	public modifyWidget(opts: SomeObject)
 	{
 		return this._rest.patch(this.route + "/widget", opts);
 	}
 
-	public GetWidgetImage()
+	public getWidgetImage()
 	{
 		return this._rest.get(this.route + "/widget.png");
 	}
 	//#endregion
 
 	//#region Emojis
-	public ListEmojis(): Promise<IEmoji[]>
+	public listEmojis(): Promise<EmojiRes[]>
 	{
 		return this._rest.get(this.route + "/emojis");
 	}
 
-	public GetEmoji(id: string): Promise<IEmoji>
+	public getEmoji(id: string): Promise<EmojiRes>
 	{
 		return this._rest.get(`${this.route}/emojis/${id}`);
 	}
 
-	public CreateEmoji(id: string, opts: ICreateEmoji): Promise<IEmoji>
+	public createEmoji(id: string, opts: CreateEmojiReq): Promise<EmojiRes>
 	{
 		return this._rest.post(`${this.route}/emojis/${id}`, opts);
 	}
 
-	public ModifyEmoji(id: string, opts: IModifyEmoji): Promise<IEmoji>
+	public modifyEmoji(id: string, opts: ModifyEmojiReq): Promise<EmojiRes>
 	{
 		return this._rest.patch(`${this.route}/emojis/${id}`, opts);
 	}
 
-	public DeleteEmoji(id: string): Promise<void>
+	public deleteEmoji(id: string): Promise<void>
 	{
 		return this._rest.delete(`${this.route}/emojis/${id}`);
 	}
 	//#endregion
 
 	//#region Misc
-	public GetVoiceRegions()
+	public getVoiceRegions()
 	{
 		return this._rest.get(this.route + "/regions");
 	}
 
-	public GetInvites()
+	public getInvites()
 	{
 		return this._rest.get(this.route + "/invites");
 	}
 
-	public GetVanityUrl()
+	public getVanityUrl()
 	{
 		return this._rest.get(this.route + "/vanity-url");
 	}
 
-	public GetAuditLog(opts?: IGetAuditLogOptions): Promise<IAuditLog>
+	public getAuditLog(opts?: AuditLogOptionsReq): Promise<AuditLogRes>
 	{
 		let nRoute = this.route;
 		

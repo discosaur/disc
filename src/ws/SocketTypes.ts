@@ -1,0 +1,51 @@
+import { SomeObject } from "../typings/mod.ts";
+
+export type SocketEvent =
+	| "READY"
+	| "CHANNEL_CREATE"
+	| "CHANNEL_DELETE"
+	| "CHANNEL_UPDATE"
+	| "CHANNEL_PINS_UPGRADE"
+	| "GUILD_CREATE"
+	| "GUILD_DELETE"
+	| "GUILD_BAN_ADD"
+	| "GUILD_BAN_REMOVE"
+	| "GUILD_EMOJIS_UPDATE"
+	| "GUILD_INTEGRATIONS_UPDATE"
+	| "GUILD_MEMBER_ADD"
+	| "GUILD_MEMBER_REMOVE"
+	| "GUILD_MEMBER_UPDATE"
+	| "GUILD_MEMBERS_CHUNK"
+	| "GUILD_ROLE_CREATE"
+	| "GUILD_ROLE_DELETE"
+	| "GUILD_ROLE_UPDATE"
+	| "GUILD_UPDATE"
+	| "INVITE_CREATE"
+	| "INVITE_DELETE"
+	| "MESSAGE_CREATE"
+	| "MESSAGE_DELETE"
+	| "MESSAGE_UPDATE"
+	| "MESSAGE_DELETE_BULK"
+	| "MESSAGE_REACTION_ADD"
+	| "MESSAGE_REACTION_REMOVE"
+	| "MESSAGE_REACTION_REMOVE_ALL"
+	| "MESSAGE_REACTION_REMOVE_EMOJI"
+	| "PRESENCE_UPDATE"
+	| "TYPING_START"
+	| "USER_UPDATE"
+	| "VOICE_STATE_UPDATE"
+	| "VOICE_SERVER_UPDATE"
+	| "WEBHOOKS_UPDATE";
+
+export interface SocketData
+{
+	t: SocketEvent,
+	s: number,
+	op: number,
+	d: SomeObject | SocketHello
+}
+
+export interface SocketHello
+{
+	heartbeat_interval: number
+}
