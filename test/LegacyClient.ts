@@ -1,25 +1,29 @@
 import { Guilds, MeUser, Guild, User } from "./deps.ts";
-import { Channel } from "../rest/RestChannel.ts";
-import { EventEmitter, DiscordWebSocket, Rest } from "./deps.ts";
+import { RestChannel } from "../src/rest/mod.ts";
+import { SocketClient } from "../src/ws/mod.ts";
+import { RestClient } from "../src/rest/mod.ts";
+import { SomeObject, TypedEmitter } from "../src/typings/mod.ts";
 
-class BaseClient extends EventEmitter
+type ClientEvent = "ready";
+
+class BaseClient extends TypedEmitter<ClientEvent, SomeObject>
 {
-	public rest: Rest;
-	public ws?: DiscordWebSocket;
+	public rest: RestClient;
+	public ws?: SocketClient;
 	private token: string;
 
 	constructor(token: string)
 	{
 		super();
 		this.token = token;
-		this.rest = new Rest(token);
+		this.rest = new RestClient(token);
 	}
 
 	public async login()
 	{
-		const gateway = await this.rest.get("gateway/bot");
-		this.ws = new DiscordWebSocket(this.token, gateway.url + "?v=6&encoding=json");
-		this.ws.on("ready", () => this.emit("ready"));
+		const { url } = await this.rest.get("gateway/bot");
+		this.ws = new SocketClient(this.token, url);
+		this.ws.on("READY", () => this.emit("ready"));
 	}
 }
 
@@ -46,7 +50,7 @@ class Client extends BaseClient
 
 	public getChannelById(id: string)
 	{
-		return new Channel(this.rest, id);
+		return new RestChannel(this.rest, id);
 	}
 }
 

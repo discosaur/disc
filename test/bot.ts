@@ -1,10 +1,8 @@
 import { RestClient, SocketClient, RawMessage, RawReadyData } from "../mod.ts";
 import { green, yellow, red } from "../deps.ts";
 import { TOKEN } from "../env.ts";
-import { RestChannel } from "../src/rest/mod.ts";
 
 const rest = new RestClient(TOKEN);
-const restChannel = new RestChannel(rest, "714930431065325612");
 
 const { url } = await rest.get("gateway/bot");
 
@@ -25,6 +23,4 @@ ws.on("READY", async (data: RawReadyData) =>
 		yellow(`Guild count: ${green(String(data.guilds.length))}`),
 		red("=".repeat(50)),
 	].join("\n"));
-
-	console.log(await restChannel.GetMessages())
 });
