@@ -10,7 +10,7 @@ import {
 	IAuditLog
 } from "../typings/mod.ts";
 
-class Guilds
+class RestGuilds
 {
 	private readonly _rest: RestClient;
 
@@ -26,19 +26,13 @@ class Guilds
 		return this._rest.post(this.route, opts);
 	}
 
-	// Own Guilds are hidden somewhere else
-	// public Get()
-	// {
-	// 	return this._rest.get(this.route);
-	// }
-
 	public Get(id: string)
 	{
-		return new Guild(this._rest, id);
+		return new RestGuild(this._rest, id);
 	}
 }
 
-class Guild
+class RestGuild
 {
 	private readonly _rest: RestClient;
 
@@ -99,7 +93,6 @@ class Guild
 
 	public GetMember(id: string)
 	{
-		throw new Error("not implemented");
 		return this._rest.get(`${this.route}/members/${id}`);
 	}
 
@@ -293,4 +286,4 @@ class Guild
 	//#endregion
 }
 
-export { Guilds, Guild };
+export { RestGuilds as Guilds, RestGuild as Guild };

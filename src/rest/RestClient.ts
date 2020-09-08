@@ -1,7 +1,7 @@
 import { AGENT, red } from "../../deps.ts";
 import { SomeObject } from "../typings/mod.ts";
 
-class RateLimitManager
+class RestRateLimitManager
 {
 	public queues = new Map<string, Queue>()
 
@@ -42,7 +42,7 @@ export class RestClient
 {
 	private readonly _endpoint: string = "https://discord.com/api/v6/";
 	private headers: Record<string, string>;
-	private manager = new RateLimitManager()
+	private manager = new RestRateLimitManager()
 
 	constructor(token: string)
 	{

@@ -1,7 +1,7 @@
 import { RestClient as Rest } from "./RestClient.ts"
 import { ICreateMessage, SomeObject } from "../typings/mod.ts";
 
-export class Channel
+export class RestChannel
 {
 	protected readonly _rest: Rest;
 
@@ -152,7 +152,7 @@ export class Channel
 	//#endregion
 }
 
-export class GroupChannel extends Channel
+export class RestGroupChannel extends RestChannel
 {
 	constructor(rClient: Rest, id: string)
 	{

@@ -1,7 +1,7 @@
 import { RestClient } from "./RestClient.ts";
 import { IBaseGuildMe, IPatchUserMe, IConnection, IGetUserMe, SomeObject } from "../typings/mod.ts";
 
-class User
+export class RestUser
 {
 	private readonly _rest: RestClient;
 
@@ -21,7 +21,7 @@ class User
 	}
 }
 
-class MeUser
+export class RestMeUser
 {
 	private readonly _rest: RestClient;
 
@@ -86,5 +86,3 @@ class MeUser
 	}
 	//#endregion
 }
-
-export { User, MeUser };
