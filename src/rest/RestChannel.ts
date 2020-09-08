@@ -1,5 +1,6 @@
 import { RestClient as Rest } from "./RestClient.ts"
-import { ICreateMessage, SomeObject } from "../typings/mod.ts";
+import { ICreateMessage, SomeObject, anyChannelType, IMessage, IUser } from "../typings/mod.ts";
+import { IInvite } from "../typings/InviteModel.ts";
 
 export class RestChannel
 {
@@ -16,41 +17,42 @@ export class RestChannel
 	}
 
 	//#region General
-	public Get(): Promise<unknown>
+	public Get(): Promise<anyChannelType>
 	{
 		return this._rest.get(this.route);
 	}
 
-	public Modify(): Promise<unknown>
+	public Modify(): Promise<anyChannelType>
 	{
 		return this._rest.get(this.route);
 	}
 
-	public Delete(): Promise<unknown>
+	public Delete(): Promise<anyChannelType>
 	{
+		// yes, it returns channel
 		return this._rest.delete(this.route);
 	}
 	//#endregion
 
 	//#region Messages
-	public GetMessages(): Promise<unknown[]>
+	public GetMessages(): Promise<IMessage[]>
 	{
 		// TODO: query params
 		return this._rest.get(`${this.route}/messages`);
 	}
 
-	public GetMessage(id: string): Promise<unknown>
+	public GetMessage(id: string): Promise<IMessage>
 	{
 		return this._rest.get(`${this.route}/messages/${id}`);
 	}
 
-	public CreateMessage(opts: ICreateMessage): Promise<unknown>
+	public CreateMessage(opts: ICreateMessage): Promise<IMessage>
 	{
 		// TODO: WARNING Before using this endpoint, you must connect to and identify with a gateway at least once.
 		return this._rest.post(`${this.route}/messages`, opts);
 	}
 	
-	public EditMessage(msgId: string, opts: SomeObject): Promise<unknown>
+	public EditMessage(msgId: string, opts: SomeObject): Promise<IMessage>
 	{
 		return this._rest.patch(`${this.route}/messages/${msgId}`, opts);
 	}
@@ -60,6 +62,11 @@ export class RestChannel
 		return this._rest.delete(`${this.route}/messages/${msgId}`);
 	}
 
+	public CrosspostMessage(msgId: string): Promise<IMessage>
+	{
+		return this._rest.delete(`${this.route}/messages/${msgId}/crosspost`);
+	}
+
 	public BulkDeleteMessages(msgs: string[]): Promise<void>
 	{
 		return this._rest.post(`${this.route}/messages/bulk-delete`, { messages: msgs});
@@ -67,7 +74,7 @@ export class RestChannel
 	//#endregion
 
 	//#region Message Pins
-	public GetPinnedMessages(): Promise<unknown[]>
+	public GetPinnedMessages(): Promise<IMessage[]>
 	{
 		return this._rest.get(`${this.route}/pins`);
 	}
@@ -99,7 +106,7 @@ export class RestChannel
 		return this._rest.delete(`${this.route}/messages/${msgId}/reactions/${emoji}/${userId}`);
 	}
 
-	public GetReactions(msgId: string, emoji: unknown): Promise<unknown>
+	public GetReactions(msgId: string, emoji: unknown): Promise<IUser>
 	{
 		return this._rest.get(`${this.route}/messages/${msgId}/reactions/${emoji}`);
 	}
@@ -116,12 +123,12 @@ export class RestChannel
 	//#endregion
 
 	//#region Invites
-	public CreateInvite(opts?: SomeObject): Promise<unknown>
+	public CreateInvite(opts?: SomeObject): Promise<IInvite>
 	{
 		return this._rest.post(`${this.route}/invites`, opts);
 	}
 
-	public GetInvites(): Promise<unknown[]>
+	public GetInvites(): Promise<IInvite[]>
 	{
 		return this._rest.get(`${this.route}/invites`);
 	}

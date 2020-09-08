@@ -73,3 +73,15 @@ export enum ChannelType
 	GUILD_NEWS = 5,
 	GUILD_STORE = 6
 }
+
+export type anyChannelType =
+	| IBaseChannel
+	| IBaseGuildChannel
+	| IGuildTextChannel
+	| IGuildNewsChannel
+	| IDmChannel
+	| IDmGroupChannel
+	| ICategoryChannel
+	| IStoreChannel
+	| IGuildVoiceChannel
+	| IDmChannelRecipient;

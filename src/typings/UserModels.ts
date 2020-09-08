@@ -36,3 +36,20 @@ export interface IConnection
 	show_activity: boolean,
 	visibility: 0 | 1 | number
 }
+
+export interface IUser
+{
+	id: string
+	username: string
+	discriminator: string
+	avatar?: string | null
+	bot?: boolean
+	system?: boolean
+	mfa_enabled?: boolean
+	locale?: string
+	verified?: boolean
+	email?: string | null
+	flags?: number
+	premium_type?: 0 | 1 | 2 | number
+	public_flags?: number
+}
