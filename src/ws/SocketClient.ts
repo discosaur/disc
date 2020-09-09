@@ -63,7 +63,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 			if (resuming)
 				this.resume();
 
-			await Promise.race([messages()]).catch(console.error);
+			messages().catch(console.error);
 
 		}
 		catch (err)

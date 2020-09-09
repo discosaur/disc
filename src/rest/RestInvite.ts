@@ -16,11 +16,11 @@ export class RestInvite
 	// code is not a snowflake or id
 	public get(code: string): Promise<unknown>
 	{
-		return this._rest.get(this.route + code);
+		return this._rest.get<unknown>(this.route + code);
 	}
 
 	public delete(code: string): Promise<unknown>
 	{
-		return this._rest.delete(this.route + code);
+		return this._rest.delete<unknown>(this.route + code);
 	}
 }

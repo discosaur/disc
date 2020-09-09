@@ -53,32 +53,32 @@ export class RestClient
 		}
 	}
 	
-	public get(path: string)
+	public get<T extends unknown>(path: string): Promise<T>
 	{
 		return this.do("GET", path);
 	}
 	
-	public post(path: string, body?: SomeObject)
+	public post<T extends unknown>(path: string, body?: SomeObject): Promise<T>
 	{
 		return this.do("POST", path, body);
 	}
 
-	public patch(path: string, body: SomeObject)
+	public patch<T extends unknown>(path: string, body: SomeObject): Promise<T>
 	{
 		return this.do("PATCH", path, body);
 	}
 
-	public put(path: string, body?: SomeObject)
+	public put<T extends unknown>(path: string, body?: SomeObject): Promise<T>
 	{
 		return this.do("PUT", path, body);
 	}
 
-	public delete(path: string)
+	public delete<T extends unknown>(path: string): Promise<T>
 	{
 		return this.do("DELETE", path);
 	}
 
-	protected async do(method: Method, path: string, body?: SomeObject): Promise<any>
+	protected async do<T extends unknown>(method: Method, path: string, body?: SomeObject): Promise<T>
 	{
 
 		const baseRoute = path.split("/").slice(0, 2).join("/");
@@ -108,16 +108,21 @@ export class RestClient
 			console.log(red("oopsie! ratelimits :( WIP"));
 
 		if (res.status >= 400)
-			return { error: res.statusText };
+			throw new Error(res.statusText);
 
 		else if (res.body != null)
 			return res.json();
-
-		else return undefined;
+		else
+			return {} as T;
 	}
 }
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+interface ErrorResponse
+{
+	error: string
+}
 
 interface Queue
 {

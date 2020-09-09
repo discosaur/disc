@@ -15,6 +15,6 @@ export class RestVoice
 
 	public getRegions(): Promise<unknown[]>
 	{
-		return this._rest.get(this.route + "/regions");
+		return this._rest.get<unknown[]>(this.route + "/regions");
 	}
 }
