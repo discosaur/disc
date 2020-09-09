@@ -10,7 +10,7 @@ import {
 } from "../typings/mod.ts";
 import { RestClient } from "./mod.ts";
 
-class RestGuilds
+export class RestGuilds
 {
 	private readonly _rest: RestClient;
 
@@ -32,7 +32,7 @@ class RestGuilds
 	}
 }
 
-class RestGuild
+export class RestGuild
 {
 	private readonly _rest: RestClient;
 
@@ -285,5 +285,3 @@ class RestGuild
 	}
 	//#endregion
 }
-
-export { RestGuilds as Guilds, RestGuild as Guild };
