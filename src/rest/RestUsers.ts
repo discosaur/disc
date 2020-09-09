@@ -35,13 +35,13 @@ export class RestMeUser
 	//#region General
 	public get(): Promise<ClientUserRes>
 	{
-		return this._rest.get(this.route);
+		return this._rest.get<ClientUserRes>(this.route);
 	}
 
 	// TODO This has may have params
 	public modify(opts: PatchClientUserReq): Promise<ClientUserRes>
 	{
-		return this._rest.patch(this.route, opts);
+		return this._rest.patch<ClientUserRes>(this.route, opts);
 	}
 	//#endregion
 	
@@ -49,12 +49,12 @@ export class RestMeUser
 	// TODO This has may have params
 	public getGuilds(): Promise<GuildRes>
 	{
-		return this._rest.get(this.route + "/guilds");
+		return this._rest.get<GuildRes>(this.route + "/guilds");
 	}
 	
 	public leaveGuild(id: string): Promise<void>
 	{
-		return this._rest.delete(`${this.route}/guilds/${id}`);
+		return this._rest.delete<void>(`${this.route}/guilds/${id}`);
 	}
 	//#endregion
 
@@ -65,24 +65,24 @@ export class RestMeUser
 	 */
 	public getDmChannels(): Promise<unknown[]>
 	{
-		return this._rest.get(this.route + "/channels");
+		return this._rest.get<unknown[]>(this.route + "/channels");
 	}
 
 	public createDm(opts: string): Promise<unknown>
 	{
-		return this._rest.post(this.route + "/channels", { recipient_id: opts });
+		return this._rest.post<unknown>(this.route + "/channels", { recipient_id: opts });
 	}
 
 	public createGroupDm(opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.post(this.route + "/channels", opts);
+		return this._rest.post<unknown>(this.route + "/channels", opts);
 	}
 	//#endregion
 
 	//#region Misc
-	public getUserConnections(): Promise<ConnectionRes>
+	public getUserConnections(): Promise<ConnectionRes[]>
 	{
-		return this._rest.get(this.route + "/connections");
+		return this._rest.get<ConnectionRes[]>(this.route + "/connections");
 	}
 	//#endregion
 }

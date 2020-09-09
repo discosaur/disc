@@ -21,9 +21,9 @@ export class RestGuilds
 		this._rest = rClient;
 	}
 
-	public Create(opts: SomeObject)
+	public Create(opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.post(this.route, opts);
+		return this._rest.post<unknown>(this.route, opts);
 	}
 
 	public Get(id: string)
@@ -55,7 +55,7 @@ export class RestGuild
 
 	public Modify(opts: GuildModifyReq): Promise<GuildRes>
 	{
-		return this._rest.patch(this.route, opts);
+		return this._rest.patch<GuildRes>(this.route, opts);
 	}
 
 	public Delete(): Promise<void>
@@ -67,185 +67,185 @@ export class RestGuild
 	//#region Channels
 	public GetChannels(): Promise<unknown[]>
 	{
-		return this._rest.get(this.route + "/channels");
+		return this._rest.get<unknown[]>(this.route + "/channels");
 	}
 
 	public ModifyChannels(id: string, opts: {
 		name?: string,
 		type: "TEXT" | "NEWS",
 		position: number
-	})
+	}): Promise<unknown>
 	{
-		return this._rest.patch(`${this.route}/channels/${id}`, opts);
+		return this._rest.patch<unknown>(`${this.route}/channels/${id}`, opts);
 	}
 
-	public ReorderChannels(opts: SomeObject)
+	public ReorderChannels(opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.patch(this.route + "/channels", opts)
+		return this._rest.patch<unknown>(this.route + "/channels", opts)
 	}
 	//#endregion
 
 	//#region Members
-	public getMembers()
+	public getMembers(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/members");
+		return this._rest.get<unknown>(this.route + "/members");
 	}
 
-	public getMember(id: string)
+	public getMember(id: string): Promise<unknown>
 	{
-		return this._rest.get(`${this.route}/members/${id}`);
+		return this._rest.get<unknown>(`${this.route}/members/${id}`);
 	}
 
-	public addMember(id: string, opts: SomeObject)
+	public addMember(id: string, opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.put(`${this.route}/members/${id}`, opts);
+		return this._rest.put<unknown>(`${this.route}/members/${id}`, opts);
 	}
 
-	public modifyMember(id: string, opts: SomeObject)
+	public modifyMember(id: string, opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.patch(`${this.route}/members/${id}`, opts);
+		return this._rest.patch<unknown>(`${this.route}/members/${id}`, opts);
 	}
 
-	public removeMember(id: string)
+	public removeMember(id: string): Promise<unknown>
 	{
-		return this._rest.delete(`${this.route}/members/${id}`);
+		return this._rest.delete<unknown>(`${this.route}/members/${id}`);
 	}
 
-	public modifyOwnNick(id: string, nick: string)
+	public modifyOwnNick(id: string, nick: string): Promise<unknown>
 	{
-		return this._rest.put(`${this.route}/members/@me/nick`, { nick: nick });
+		return this._rest.put<unknown>(`${this.route}/members/@me/nick`, { nick: nick });
 	}
 	//#endregion
 
 	//#region Roles
-	public getRoles()
+	public getRoles(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/roles");
+		return this._rest.get<unknown>(this.route + "/roles");
 	}
 	
-	public createRole()
+	public createRole(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/roles");
+		return this._rest.get<unknown>(this.route + "/roles");
 	}
 	
-	public reorderRoles(opts: SomeObject)
+	public reorderRoles(opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.patch(this.route + "/roles", opts);
+		return this._rest.patch<unknown>(this.route + "/roles", opts);
 	}
 	
-	public modifyRole(id: string, opts: SomeObject)
+	public modifyRole(id: string, opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.patch(`${this.route}/roles/${id}`, opts);
+		return this._rest.patch<unknown>(`${this.route}/roles/${id}`, opts);
 	}
 	
-	public deleteRole(id: string)
+	public deleteRole(id: string): Promise<unknown>
 	{
-		return this._rest.delete(`${this.route}/roles/${id}`);
+		return this._rest.delete<unknown>(`${this.route}/roles/${id}`);
 	}
 
-	public assignRoleToMember(userId: string, roleId: string)
+	public assignRoleToMember(userId: string, roleId: string): Promise<unknown>
 	{
-		return this._rest.put(`${this.route}/members/${userId}/roles/${roleId}`);
+		return this._rest.put<unknown>(`${this.route}/members/${userId}/roles/${roleId}`);
 	}
 
-	public removeRoleFromMember(userId: string, roleId: string)
+	public removeRoleFromMember(userId: string, roleId: string): Promise<unknown>
 	{
-		return this._rest.delete(`${this.route}/members/${userId}/roles/${roleId}`);
+		return this._rest.delete<unknown>(`${this.route}/members/${userId}/roles/${roleId}`);
 	}
 	//#endregion
 
 	//#region Bans
-	public getBans()
+	public getBans(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "bans");
+		return this._rest.get<unknown>(this.route + "bans");
 	}
 
-	public getBan(id: string)
+	public getBan(id: string): Promise<unknown>
 	{
-		return this._rest.get(`${this.route}/bans/${id}`);
+		return this._rest.get<unknown>(`${this.route}/bans/${id}`);
 	}
 
-	public createBan(id: string)
+	public createBan(id: string): Promise<unknown>
 	{
-		return this._rest.put(`${this.route}/bans/${id}`);
+		return this._rest.put<unknown>(`${this.route}/bans/${id}`);
 	}
 	
-	public removeBan(id: string)
+	public removeBan(id: string): Promise<unknown>
 	{
-		return this._rest.delete(`${this.route}/bans/${id}`);
+		return this._rest.delete<unknown>(`${this.route}/bans/${id}`);
 	}
 	//#endregion
 
 	//#region Prune
-	public getPruneCount()
+	public getPruneCount(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/prune");
+		return this._rest.get<unknown>(this.route + "/prune");
 	}
 
-	public beginPrune(opts?: SomeObject)
+	public beginPrune(opts?: SomeObject): Promise<unknown>
 	{
-		return this._rest.post(this.route + "/prune", opts);
+		return this._rest.post<unknown>(this.route + "/prune", opts);
 	}
 	//#endregion
 
 	//#region Integrations
-	public getIntegrations()
+	public getIntegrations(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/integrations");
+		return this._rest.get<unknown>(this.route + "/integrations");
 	}
 
-	public createIntegrations(opts: SomeObject)
+	public createIntegrations(opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.post(this.route + "/integrations", opts);
+		return this._rest.post<unknown>(this.route + "/integrations", opts);
 	}
 
-	public modifyIntegrations(id: string, opts: SomeObject)
+	public modifyIntegrations(id: string, opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.post(`${this.route}/integrations/${id}`, opts);
+		return this._rest.post<unknown>(`${this.route}/integrations/${id}`, opts);
 	}
 
-	public deleteIntegrations(id: string)
+	public deleteIntegrations(id: string): Promise<unknown>
 	{
-		return this._rest.delete(`${this.route}/integrations/${id}`);
+		return this._rest.delete<unknown>(`${this.route}/integrations/${id}`);
 	}
 
-	public syncIntegrations(id: string)
+	public syncIntegrations(id: string): Promise<unknown>
 	{
-		return this._rest.post(`${this.route}/integrations/${id}/sync`);
+		return this._rest.post<unknown>(`${this.route}/integrations/${id}/sync`);
 	}
 	//#endregion
 
 	//#region Widget
-	public getWidget()
+	public getWidget(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/widget");
+		return this._rest.get<unknown>(this.route + "/widget");
 	}
 
-	public modifyWidget(opts: SomeObject)
+	public modifyWidget(opts: SomeObject): Promise<unknown>
 	{
-		return this._rest.patch(this.route + "/widget", opts);
+		return this._rest.patch<unknown>(this.route + "/widget", opts);
 	}
 
-	public getWidgetImage()
+	public getWidgetImage(): Promise<unknown>
 	{
-		return this._rest.get(this.route + "/widget.png");
+		return this._rest.get<unknown>(this.route + "/widget.png");
 	}
 	//#endregion
 
 	//#region Emojis
 	public listEmojis(): Promise<EmojiRes[]>
 	{
-		return this._rest.get(this.route + "/emojis");
+		return this._rest.get<EmojiRes[]>(this.route + "/emojis");
 	}
 
 	public getEmoji(id: string): Promise<EmojiRes>
 	{
-		return this._rest.get(`${this.route}/emojis/${id}`);
+		return this._rest.get<EmojiRes>(`${this.route}/emojis/${id}`);
 	}
 
 	public createEmoji(id: string, opts: CreateEmojiReq): Promise<EmojiRes>
 	{
-		return this._rest.post(`${this.route}/emojis/${id}`, opts);
+		return this._rest.post<EmojiRes>(`${this.route}/emojis/${id}`, opts);
 	}
 
 	public modifyEmoji(id: string, opts: ModifyEmojiReq): Promise<EmojiRes>
@@ -255,24 +255,24 @@ export class RestGuild
 
 	public deleteEmoji(id: string): Promise<void>
 	{
-		return this._rest.delete(`${this.route}/emojis/${id}`);
+		return this._rest.delete<void>(`${this.route}/emojis/${id}`);
 	}
 	//#endregion
 
 	//#region Misc
-	public getVoiceRegions()
+	public getVoiceRegions(): Promise<void>
 	{
-		return this._rest.get(this.route + "/regions");
+		return this._rest.get<void>(this.route + "/regions");
 	}
 
-	public getInvites()
+	public getInvites(): Promise<void>
 	{
-		return this._rest.get(this.route + "/invites");
+		return this._rest.get<void>(this.route + "/invites");
 	}
 
-	public getVanityUrl()
+	public getVanityUrl(): Promise<void>
 	{
-		return this._rest.get(this.route + "/vanity-url");
+		return this._rest.get<void>(this.route + "/vanity-url");
 	}
 
 	public getAuditLog(opts?: AuditLogOptionsReq): Promise<AuditLogRes>
@@ -281,7 +281,7 @@ export class RestGuild
 		
 		// TODO: Append options to route
 
-		return this._rest.get(nRoute + "/audit-logs");
+		return this._rest.get<AuditLogRes>(nRoute + "/audit-logs");
 	}
 	//#endregion
 }
