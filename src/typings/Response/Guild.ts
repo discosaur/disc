@@ -1,7 +1,9 @@
+import { Snowflake } from "../mod.ts";
+
 // from get users/@me/guilds
 interface SimpleGuildRes
 {
-	id: string,
+	id: Snowflake,
 	name: string,
 	icon?: string,
 	owner: boolean,
@@ -10,9 +12,9 @@ interface SimpleGuildRes
 }
 
 // from get guilds/714930431065325609
-export interface GuildRes
+export interface GuildRes extends SimpleGuildRes
 {
-	id: string,
+	id: Readonly<Snowflake>,
 	name: string,
 	description: string,
 	splash: unknown | null,
@@ -64,3 +66,5 @@ export interface GuildRes
 	embed_enabled: boolean,
 	embed_channel_id: string
 }
+
+export { GuildRes as IGuild };
