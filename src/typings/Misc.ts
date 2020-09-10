@@ -1,6 +1,3 @@
-export interface SomeObject
-{
-	id: Readonly<Snowflake>
-};
+export interface SomeObject { };
 
 export type Snowflake = string;
