@@ -43,7 +43,7 @@ export class RestClient
 	private headers: Record<string, string>;
 	private manager = new RestRateLimitManager()
 
-	constructor(token: string)
+	constructor(public token: string)
 	{
 		this.headers = {
 			"Authorization": "Bot " + token,

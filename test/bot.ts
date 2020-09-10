@@ -4,9 +4,7 @@ import { TOKEN } from "../env.ts";
 
 const rest = new RestClient(TOKEN);
 
-const { url } = await rest.get<{ url: string }>("gateway/bot");
-
-const ws = new SocketClient(TOKEN, url);
+const ws = new SocketClient(rest);
 
 ws.on("MESSAGE_CREATE", async (message: MessageRes) =>
 {

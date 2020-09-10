@@ -4,11 +4,12 @@ import {
 	connectWebSocket,
 	isWebSocketCloseEvent,
 	WebSocket,
-	red
+	red, green
 } from "../../deps.ts";
 
 import { SocketEvent, SocketData, SocketHello } from "./mod.ts";
 import { SomeObject, TypedEmitter } from "../typings/mod.ts";
+import { RestClient } from "../../mod.ts";
 
 export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 {
@@ -18,26 +19,25 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 	private heartbeatInterval?: number;
 	private heartbeatAcknowledged = true;
 
-	constructor(private readonly token: string, public readonly gateway: string)
+	constructor(public rest: RestClient)
 	{
 		super();
-		this.gateway += "?v=6&encoding=json";
 		this.setup();
-	}
-
-	public send(opcode: number, data: SomeObject)
-	{
-		this.socket?.send(JSON.stringify({
-			op: opcode,
-			d: data
-		}));
 	}
 
 	private async setup(resuming?: boolean)
 	{
+		const { url } = await this.rest.get<{ url: string }>("gateway/bot");
+
+		if (!url)
+			throw new Error("Could not fetch websocket endpoint");
+
+		clearInterval(this.heartbeatInterval);
+
 		try
 		{
-			this.socket = await connectWebSocket(this.gateway);
+			console.log(green("Trying to connect to socket"));
+			this.socket = await connectWebSocket(url + "?v=6&encoding=json");
 
 			const messages = async (): Promise<void> =>
 			{
@@ -54,17 +54,23 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 					}
 
 					else if (isWebSocketCloseEvent(msg))
-						console.log(red(`closed: code=${msg.code}, reason=${msg.reason}`));
+					{
+						console.log(red(`closed: code=${msg.code}, reason=${msg.reason}, reconnecting`));
+						this.setup();
+					}
 				}
 			}
+			console.log(green("Connected to socket!"));
 
 			this.authenticate();
 
 			if (resuming)
+			{
+				console.log(green("Trying to resume session"));
 				this.resume();
+			}
 
 			messages().catch(console.error);
-
 		}
 		catch (err)
 		{
@@ -75,16 +81,27 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 	private resume()
 	{
 		this.send(6, {
-			token: this.token,
+			token: this.rest.token,
 			session_id: this.sessionId,
 			seq: this.lastSequence
 		});
 	}
 
+	public send(opcode: number, data: any)
+	{
+		if (this.socket?.isClosed)
+			return;
+		this.socket?.send(JSON.stringify({
+			op: opcode,
+			d: data
+		}));
+	}
+
 	private authenticate()
 	{
+		console.log(green("Authenticating..."));
 		this.send(2, {
-			token: this.token,
+			token: this.rest.token,
 			properties: {
 				$os: platform,
 				$browser: AGENT,
@@ -106,7 +123,9 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 
 			// Invalidation
 			case 9:
-				try { await this.socket?.close() } catch { }
+				clearInterval(this.heartbeatInterval);
+				if (!this.socket?.isClosed)
+							this.socket?.close();
 				if (data.d)
 					this.setup(true);
 				else
@@ -117,15 +136,17 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 			case 10:
 				clearInterval(this.heartbeatInterval)
 				const ms = (data.d as SocketHello).heartbeat_interval;
-				this.heartbeatInterval = setInterval(async () =>
+				this.heartbeatInterval = setInterval(() =>
 				{
 					if (!this.heartbeatAcknowledged)
 					{
-						this.socket?.close().catch();
-						throw new Error(red("No hearbeat Ack received by the discord gateway"));
+						if (!this.socket?.isClosed)
+							this.socket?.close();
+						console.log(red("No heartbeat Ack received by the discord gateway, reconnecting..."));
+						this.setup();
 					}
 					this.heartbeatAcknowledged = false;
-					await this.socket?.send(JSON.stringify({ op: 1, d: this.lastSequence }));
+					this.send(1, this.lastSequence)
 				}, ms);
 				break;
 

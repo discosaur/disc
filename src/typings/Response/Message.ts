@@ -7,9 +7,9 @@ export interface MessageRes
 	timestamp: string
 	pinned: boolean
 	nonce?: Snowflake
-	mentions: []
-	mention_roles: []
-	mention_channels: []
+	mentions: UserRes[]
+	mention_roles: Snowflake[]
+	mention_channels: Snowflake[]
 	mention_everyone: boolean
 	reactions: ReactionRes[]
 	member?: MemberRes
