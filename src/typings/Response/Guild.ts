@@ -12,7 +12,7 @@ interface SimpleGuildRes
 }
 
 // from get guilds/714930431065325609
-export interface GuildRes extends SimpleGuildRes
+export interface GuildRes /*extends SimpleGuildRes*/
 {
 	id: Readonly<Snowflake>,
 	name: string,
