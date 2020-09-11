@@ -15,12 +15,17 @@ import { RestClient } from "../../mod.ts";
 export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 {
 	private socket?: WebSocket;
-	private session = new SessionStore(false, null, null, undefined);
+	private session = new SessionStore();
 
 	constructor(public rest: RestClient)
 	{
 		super();
 		this.setup();
+	}
+
+	public get ping(): number | undefined
+	{
+		return this.session.ping;
 	}
 
 	private async setup(resuming?: boolean)
@@ -105,7 +110,8 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 
 	private heartbeat()
 	{
-		this.emit("DEBUG", { message: "Sending a heartbeat.." })
+		this.emit("DEBUG", { message: "Sending a heartbeat..." })
+		this.session.heartbeatTimestamp = Date.now();
 		this.send(opcodes.HEARTBEAT, this.session.sequence);
 	}
 
@@ -171,8 +177,9 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 				break;
 
 			case opcodes.HEARTBEAT_ACK:
-				this.emit("DEBUG", { message: "Heartbeat acknowledged" });
 				this.session.acknowledged = true;
+				this.session.ping = Date.now() - this.session.heartbeatTimestamp!;
+				this.emit("DEBUG", { message: `Heartbeat acknowledged (ping: ${this.ping}ms)` });
 				break;
 		}
 	}

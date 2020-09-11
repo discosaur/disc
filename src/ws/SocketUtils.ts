@@ -57,10 +57,12 @@ export interface DebugMessage
 export class SessionStore
 {
 	constructor(
-		public acknowledged: boolean,
-		public sequence: number | null,
-		public id: string | null,
-		public interval: number | undefined
+		public acknowledged: boolean = false,
+		public sequence: number | undefined = undefined,
+		public id: string | null = null,
+		public interval: number | undefined = undefined,
+		public heartbeatTimestamp: number | undefined = undefined,
+		public ping: number | undefined = undefined
 	) { }
 }
 
