@@ -1,23 +1,21 @@
 import {
-	platform,
-	AGENT,
+	WebSocket,
 	connectWebSocket,
 	isWebSocketCloseEvent,
-	WebSocket,
-	red, green
+	platform,
+	red,
+	green,
+	AGENT
 } from "../../deps.ts";
 
-import { SocketEvent, SocketData, SocketHello } from "./mod.ts";
+import { SocketEvent, SocketData, SessionStore, opcodes } from "./mod.ts";
 import { SomeObject, TypedEmitter } from "../typings/mod.ts";
 import { RestClient } from "../../mod.ts";
 
 export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 {
 	private socket?: WebSocket;
-	public lastSequence: number | null = null;
-	public sessionId?: string;
-	private heartbeatInterval?: number;
-	private heartbeatAcknowledged = true;
+	private session = new SessionStore(false, null, null, undefined);
 
 	constructor(public rest: RestClient)
 	{
@@ -31,8 +29,6 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 
 		if (!url)
 			throw new Error("Could not fetch websocket endpoint");
-
-		clearInterval(this.heartbeatInterval);
 
 		try
 		{
@@ -48,7 +44,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 						const json = JSON.parse(msg) as SocketData;
 
 						if (typeof json.s === "number")
-							this.lastSequence = json.s;
+							this.session.sequence = json.s;
 
 						this.switchOpCode(json);
 					}
@@ -56,13 +52,12 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 					else if (isWebSocketCloseEvent(msg))
 					{
 						console.log(red(`closed: code=${msg.code}, reason=${msg.reason}, reconnecting`));
-						this.setup();
 					}
 				}
 			}
 			console.log(green("Connected to socket!"));
 
-			this.authenticate();
+			this.identify();
 
 			if (resuming)
 			{
@@ -80,10 +75,10 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 
 	private resume()
 	{
-		this.send(6, {
+		this.send(opcodes.RESUME, {
 			token: this.rest.token,
-			session_id: this.sessionId,
-			seq: this.lastSequence
+			session_id: this.session.id,
+			seq: this.session.sequence
 		});
 	}
 
@@ -97,10 +92,10 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 		}));
 	}
 
-	private authenticate()
+	private identify()
 	{
-		console.log(green("Authenticating..."));
-		this.send(2, {
+		console.log(green("Identifying..."));
+		this.send(opcodes.IDENTIFY, {
 			token: this.rest.token,
 			properties: {
 				$os: platform,
@@ -110,49 +105,66 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 		});
 	}
 
+	private heartbeat()
+	{
+		this.send(opcodes.HEARTBEAT, this.session.sequence);
+	}
+
+	private updateSequence(s: number | undefined)
+	{
+		if (s != undefined)
+			this.session.sequence = s;
+	}
+
+	private async close()
+	{
+		clearInterval(this.session.interval);
+		if (!this.socket!.isClosed)
+			await this.socket!.close();
+	}
+
 	private async switchOpCode(data: SocketData)
 	{
 		switch(data.op)
 		{
-			// Data
-			case 0:
-				if ((data.d as { session_id?: string }).session_id)
-					this.sessionId = (data.d as { session_id: string }).session_id;
+			case opcodes.EVENT:
+				if (data.t == "READY")
+					this.session.id = (data.d as { session_id: string }).session_id;
+				this.updateSequence(data.s);
 				this.emit(data.t, data.d);
 				break;
 
-			// Invalidation
-			case 9:
-				clearInterval(this.heartbeatInterval);
-				if (!this.socket?.isClosed)
-							this.socket?.close();
-				if (data.d)
-					this.setup(true);
-				else
-					this.setup();
+			case opcodes.HEARTBEAT:
+				this.heartbeat();
 				break;
 
-			// Heartbeat request
-			case 10:
-				clearInterval(this.heartbeatInterval)
-				const ms = (data.d as SocketHello).heartbeat_interval;
-				this.heartbeatInterval = setInterval(() =>
+			case opcodes.RECONNECT:
+				this.updateSequence(data.s);
+				this.close();
+				this.setup(true);
+				break;
+
+			case opcodes.INVALIDATED:
+				this.emit("INVALIDATED", {});
+				this.close();
+				break;
+
+			case opcodes.HELLO:
+				this.session.acknowledged = true;
+				this.session.interval = setInterval(() =>
 				{
-					if (!this.heartbeatAcknowledged)
+					if (!this.session.acknowledged)
 					{
-						if (!this.socket?.isClosed)
-							this.socket?.close();
-						console.log(red("No heartbeat Ack received by the discord gateway, reconnecting..."));
+						this.close();
 						this.setup();
 					}
-					this.heartbeatAcknowledged = false;
-					this.send(1, this.lastSequence)
-				}, ms);
+					else
+						this.heartbeat();
+				}, (data.d as { heartbeat_interval: number }).heartbeat_interval);
 				break;
 
-			// Heartbeat Acknowledgement
-			case 11:
-				this.heartbeatAcknowledged = true;
+			case opcodes.HEARTBEAT_ACK:
+				this.session.acknowledged = true;
 				break;
 		}
 	}

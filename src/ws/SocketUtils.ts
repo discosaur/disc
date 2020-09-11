@@ -35,17 +35,38 @@ export type SocketEvent =
 	| "USER_UPDATE"
 	| "VOICE_STATE_UPDATE"
 	| "VOICE_SERVER_UPDATE"
-	| "WEBHOOKS_UPDATE";
+	| "WEBHOOKS_UPDATE"
+	| "INVALIDATED";
 
 export interface SocketData
 {
 	t: SocketEvent,
 	s: number,
 	op: number,
-	d: SomeObject | SocketHello
+	d: SomeObject
 }
 
-export interface SocketHello
+export class SessionStore
 {
-	heartbeat_interval: number
+	constructor(
+		public acknowledged: boolean,
+		public sequence: number | null,
+		public id: string | null,
+		public interval: number | undefined
+	) { }
+}
+
+export enum opcodes
+{
+	EVENT = 0,
+	HEARTBEAT = 1,
+	IDENTIFY = 2,
+	PRESENCE_UPDATE = 3,
+	VOICE_UPDATE = 4,
+	RESUME = 6,
+	RECONNECT = 7,
+	REQUEST_MEMBERS = 8,
+	INVALIDATED = 9,
+	HELLO = 10,
+	HEARTBEAT_ACK = 11
 }

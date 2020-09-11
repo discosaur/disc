@@ -5,4 +5,4 @@ export { connectWebSocket, WebSocket, isWebSocketCloseEvent } from "https://deno
 export { red, yellow, green } from "https://deno.land/std@0.68.0/fmt/colors.ts";
 export { platform } from "https://deno.land/std@0.68.0/node/process.ts";
 
-export const AGENT = "disc (0.1.0)";
+export const AGENT = "DiscordBot (deno.land/x/disc 0.3.0)";
