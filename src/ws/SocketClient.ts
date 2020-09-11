@@ -92,7 +92,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 
 	private identify()
 	{
-		console.log(green("Identifying..."));
+		this.emit("DEBUG", { message: "Identifying with WebSocket connection..." });
 		this.send(opcodes.IDENTIFY, {
 			token: this.rest.token,
 			properties: {
