@@ -119,11 +119,6 @@ export class RestClient
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-interface ErrorResponse
-{
-	error: string
-}
-
 interface Queue
 {
 	okay: boolean

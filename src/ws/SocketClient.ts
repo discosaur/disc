@@ -3,8 +3,6 @@ import {
 	connectWebSocket,
 	isWebSocketCloseEvent,
 	platform,
-	red,
-	green,
 	AGENT
 } from "../../deps.ts";
 
@@ -71,7 +69,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 		}
 		catch (err)
 		{
-			console.error(red(`Could not connect to WebSocket: "${err}"`));
+			console.error(`Could not connect to WebSocket: "${err}"`);
 		}
 	}
 
