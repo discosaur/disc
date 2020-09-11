@@ -6,7 +6,7 @@ import {
 	ModifyEmojiReq,
 	AuditLogOptionsReq,
 	AuditLogRes,
-	SomeObject
+	SomeObject, IGuildMember
 } from "../typings/mod.ts";
 import { RestClient } from "./mod.ts";
 
@@ -45,6 +45,7 @@ export class RestGuild
 		this.id = id;
 		this.route = "guilds/" + this.id;
 	}
+
 	//#region General
 	public Get(onlyPreview?: boolean): Promise<GuildRes>
 	{
@@ -86,14 +87,22 @@ export class RestGuild
 	//#endregion
 
 	//#region Members
-	public getMembers(): Promise<unknown>
+	public getMembers(limit?: number | "max"): Promise<IGuildMember[]>
 	{
-		return this._rest.get<unknown>(this.route + "/members");
+		limit ??= 1;
+		if (limit = "max")
+			limit = 100;
+		else if (limit > 100)
+			throw new Error("Limit can not be greater than 100");
+		else if (limit < 1)
+			throw new Error("Limit can not be less than 1");
+		
+		return this._rest.get<IGuildMember[]>(`${this.route}/members?limit=${limit}`);
 	}
 
-	public getMember(id: string): Promise<unknown>
+	public getMember(id: string): Promise<IGuildMember>
 	{
-		return this._rest.get<unknown>(`${this.route}/members/${id}`);
+		return this._rest.get<IGuildMember>(`${this.route}/members/${id}`);
 	}
 
 	public addMember(id: string, opts: SomeObject): Promise<unknown>

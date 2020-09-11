@@ -14,9 +14,10 @@ interface SimpleGuildRes
 // from get guilds/714930431065325609
 export interface GuildRes /*extends SimpleGuildRes*/
 {
-	id: Readonly<Snowflake>,
+	id: Snowflake, 
 	name: string,
 	description: string,
+	icon?: string,
 	splash: unknown | null,
 	discovery_splash : unknown | null,
 	features: string[],
