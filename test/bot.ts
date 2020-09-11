@@ -6,6 +6,8 @@ const rest = new RestClient(TOKEN);
 
 const ws = new SocketClient(rest);
 
+ws.on("DEBUG", ({ message }) => console.log(green("[DEBUG] [WS] ") + yellow(message)));
+
 ws.on("MESSAGE_CREATE", async (message: MessageRes) =>
 {
 	if (message.content == "ping")

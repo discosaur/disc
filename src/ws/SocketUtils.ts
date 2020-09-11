@@ -1,6 +1,7 @@
 import { SomeObject } from "../typings/mod.ts";
 
 export type SocketEvent =
+	// raw discord events
 	| "READY"
 	| "CHANNEL_CREATE"
 	| "CHANNEL_DELETE"
@@ -36,7 +37,9 @@ export type SocketEvent =
 	| "VOICE_STATE_UPDATE"
 	| "VOICE_SERVER_UPDATE"
 	| "WEBHOOKS_UPDATE"
-	| "INVALIDATED";
+	// self-defined events for utility
+	| "INVALIDATED"
+	| "DEBUG";
 
 export interface SocketData
 {
@@ -44,6 +47,11 @@ export interface SocketData
 	s: number,
 	op: number,
 	d: SomeObject
+}
+
+export interface DebugMessage
+{
+	message: string
 }
 
 export class SessionStore
