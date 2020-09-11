@@ -11,8 +11,8 @@ export interface Embed
 	thumbnail?: EmbedThumbnail
 	video?: EmbedVideo
 	provider?: EmbedProvider
-	author: EmbedAuthor
-	fields: EmbedField[]
+	author?: EmbedAuthor
+	fields?: EmbedField[]
 }
 
 export interface EmbedFooter
@@ -31,7 +31,7 @@ export interface EmbedField
 
 export interface EmbedImage
 {
-	url?: string
+	url: string
 	proxy_url?: string
 	height?: number
 	width?: number
@@ -39,7 +39,7 @@ export interface EmbedImage
 
 export interface EmbedThumbnail
 {
-	url?: string
+	url: string
 	proxy_url?: string
 	height?: number
 	width?: number
@@ -47,9 +47,9 @@ export interface EmbedThumbnail
 
 export interface EmbedVideo
 {
-	url?: string
+	url: string
 	height?: string
-	width: string
+	width?: string
 }
 
 export interface EmbedProvider
@@ -60,7 +60,7 @@ export interface EmbedProvider
 
 export interface EmbedAuthor
 {
-	name?: string
+	name: string
 	url?: string
 	icon_url?: string
 	proxy_icon_url?: string
