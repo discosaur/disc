@@ -91,7 +91,7 @@ export class RestGuild
 	public getMembers(limit?: number | "max"): Promise<IGuildMember[]>
 	{
 		limit ??= 1;
-		if (limit = "max")
+		if (limit == "max")
 			limit = 100;
 		else if (limit > 100)
 			throw new Error("Limit can not be greater than 100");
