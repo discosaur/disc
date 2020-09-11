@@ -1,6 +1,7 @@
 import { SomeObject } from "../typings/mod.ts";
 
 export type SocketEvent =
+	// raw discord events
 	| "READY"
 	| "CHANNEL_CREATE"
 	| "CHANNEL_DELETE"
@@ -35,17 +36,47 @@ export type SocketEvent =
 	| "USER_UPDATE"
 	| "VOICE_STATE_UPDATE"
 	| "VOICE_SERVER_UPDATE"
-	| "WEBHOOKS_UPDATE";
+	| "WEBHOOKS_UPDATE"
+	// self-defined events for utility
+	| "INVALIDATED"
+	| "DEBUG";
 
 export interface SocketData
 {
 	t: SocketEvent,
 	s: number,
 	op: number,
-	d: SomeObject | SocketHello
+	d: SomeObject
 }
 
-export interface SocketHello
+export interface DebugMessage
 {
-	heartbeat_interval: number
+	message: string
+}
+
+export class SessionStore
+{
+	constructor(
+		public acknowledged: boolean = false,
+		public sequence: number | undefined = undefined,
+		public id: string | null = null,
+		public interval: number | undefined = undefined,
+		public heartbeatTimestamp: number | undefined = undefined,
+		public ping: number | undefined = undefined
+	) { }
+}
+
+export enum opcodes
+{
+	EVENT = 0,
+	HEARTBEAT = 1,
+	IDENTIFY = 2,
+	PRESENCE_UPDATE = 3,
+	VOICE_UPDATE = 4,
+	RESUME = 6,
+	RECONNECT = 7,
+	REQUEST_MEMBERS = 8,
+	INVALIDATED = 9,
+	HELLO = 10,
+	HEARTBEAT_ACK = 11
 }

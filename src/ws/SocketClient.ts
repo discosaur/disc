@@ -1,43 +1,43 @@
 import {
-	platform,
-	AGENT,
+	WebSocket,
 	connectWebSocket,
 	isWebSocketCloseEvent,
-	WebSocket,
-	red
+	platform,
+	AGENT
 } from "../../deps.ts";
 
-import { SocketEvent, SocketData, SocketHello } from "./mod.ts";
+import { SocketEvent, SocketData, SessionStore, opcodes } from "./mod.ts";
 import { SomeObject, TypedEmitter } from "../typings/mod.ts";
+import { RestClient } from "../../mod.ts";
 
 export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 {
 	private socket?: WebSocket;
-	public lastSequence: number | null = null;
-	public sessionId?: string;
-	private heartbeatInterval?: number;
-	private heartbeatAcknowledged = true;
+	private session = new SessionStore();
 
-	constructor(private readonly token: string, public readonly gateway: string)
+	constructor(public rest: RestClient)
 	{
 		super();
-		this.gateway += "?v=6&encoding=json";
 		this.setup();
 	}
 
-	public send(opcode: number, data: SomeObject)
+	public get ping(): number | undefined
 	{
-		this.socket?.send(JSON.stringify({
-			op: opcode,
-			d: data
-		}));
+		return this.session.ping;
 	}
 
 	private async setup(resuming?: boolean)
 	{
+		const { url } = await this.rest.get<{ url: string }>("gateway/bot");
+
+		if (!url)
+			throw new Error("Could not fetch websocket endpoint");
+
+		this.emit("DEBUG", { message: "Trying to connect to WebSocket..." });
+
 		try
 		{
-			this.socket = await connectWebSocket(this.gateway);
+			this.socket = await connectWebSocket(url + "?v=6&encoding=json");
 
 			const messages = async (): Promise<void> =>
 			{
@@ -48,43 +48,56 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 						const json = JSON.parse(msg) as SocketData;
 
 						if (typeof json.s === "number")
-							this.lastSequence = json.s;
+							this.session.sequence = json.s;
 
 						this.switchOpCode(json);
 					}
 
 					else if (isWebSocketCloseEvent(msg))
-						console.log(red(`closed: code=${msg.code}, reason=${msg.reason}`));
+						this.emit("DEBUG", { message: `WebSocket closed unexpectedly: code=${msg.code}, reasion=${msg.reason}` });
 				}
 			}
 
-			this.authenticate();
+			this.emit("DEBUG", { message: "Connected to WebSocket" });
+
+			this.identify();
 
 			if (resuming)
 				this.resume();
 
 			messages().catch(console.error);
-
 		}
 		catch (err)
 		{
-			console.error(red(`Could not connect to WebSocket: "${err}"`));
+			console.error(`Could not connect to WebSocket: "${err}"`);
 		}
 	}
 
 	private resume()
 	{
-		this.send(6, {
-			token: this.token,
-			session_id: this.sessionId,
-			seq: this.lastSequence
+		this.emit("DEBUG", { message: "Trying to resume session after reconnecting" });
+		this.send(opcodes.RESUME, {
+			token: this.rest.token,
+			session_id: this.session.id,
+			seq: this.session.sequence
 		});
 	}
 
-	private authenticate()
+	public send(opcode: number, data: any)
 	{
-		this.send(2, {
-			token: this.token,
+		if (this.socket?.isClosed)
+			return;
+		this.socket?.send(JSON.stringify({
+			op: opcode,
+			d: data
+		}));
+	}
+
+	private identify()
+	{
+		this.emit("DEBUG", { message: "Identifying with WebSocket connection..." });
+		this.send(opcodes.IDENTIFY, {
+			token: this.rest.token,
 			properties: {
 				$os: platform,
 				$browser: AGENT,
@@ -93,45 +106,81 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 		});
 	}
 
+	private heartbeat()
+	{
+		this.emit("DEBUG", { message: "Sending a heartbeat..." })
+		this.session.heartbeatTimestamp = Date.now();
+		this.send(opcodes.HEARTBEAT, this.session.sequence);
+	}
+
+	private updateSequence(s: number | undefined)
+	{
+		if (s != undefined)
+			this.session.sequence = s;
+	}
+
+	private async close()
+	{
+		clearInterval(this.session.interval);
+		if (!this.socket!.isClosed)
+		{
+			this.emit("DEBUG", { message: "Closing socket connection" })
+			await this.socket!.close();
+		}
+	}
+
 	private async switchOpCode(data: SocketData)
 	{
 		switch(data.op)
 		{
-			// Data
-			case 0:
-				if ((data.d as { session_id?: string }).session_id)
-					this.sessionId = (data.d as { session_id: string }).session_id;
+			case opcodes.EVENT:
+				this.emit("DEBUG", { message: `Received an event of type ${data.t}` });
+				if (data.t == "READY")
+					this.session.id = (data.d as { session_id: string }).session_id;
+				this.updateSequence(data.s);
 				this.emit(data.t, data.d);
 				break;
 
-			// Invalidation
-			case 9:
-				try { await this.socket?.close() } catch { }
-				if (data.d)
-					this.setup(true);
-				else
-					this.setup();
+			case opcodes.HEARTBEAT:
+				this.emit("DEBUG", { message: "Received request for an arbitrary heartbeat" });
+				this.heartbeat();
 				break;
 
-			// Heartbeat request
-			case 10:
-				clearInterval(this.heartbeatInterval)
-				const ms = (data.d as SocketHello).heartbeat_interval;
-				this.heartbeatInterval = setInterval(async () =>
+			case opcodes.RECONNECT:
+				this.emit("DEBUG", { message: "Received request to reconnect..." });
+				this.updateSequence(data.s);
+				this.close();
+				this.setup(true);
+				break;
+
+			case opcodes.INVALIDATED:
+				this.emit("DEBUG", { message: "WebSocket connection invalidated" });
+				this.emit("INVALIDATED", {});
+				this.close();
+				break;
+
+			case opcodes.HELLO:
+				this.emit("DEBUG", { message: "Received HELLO code 10 by WebSocket" });
+				this.session.acknowledged = true;
+				this.session.interval = setInterval(() =>
 				{
-					if (!this.heartbeatAcknowledged)
+					if (!this.session.acknowledged)
 					{
-						this.socket?.close().catch();
-						throw new Error(red("No hearbeat Ack received by the discord gateway"));
+						this.close();
+						this.setup();
 					}
-					this.heartbeatAcknowledged = false;
-					await this.socket?.send(JSON.stringify({ op: 1, d: this.lastSequence }));
-				}, ms);
+					else
+					{
+						this.heartbeat();
+						this.session.acknowledged = false;
+					}
+				}, (data.d as { heartbeat_interval: number }).heartbeat_interval);
 				break;
 
-			// Heartbeat Acknowledgement
-			case 11:
-				this.heartbeatAcknowledged = true;
+			case opcodes.HEARTBEAT_ACK:
+				this.session.acknowledged = true;
+				this.session.ping = Date.now() - this.session.heartbeatTimestamp!;
+				this.emit("DEBUG", { message: `Heartbeat acknowledged (ping: ${this.ping}ms)` });
 				break;
 		}
 	}

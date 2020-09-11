@@ -43,6 +43,8 @@ export class RestClient
 	private headers: Record<string, string>;
 	private manager = new RestRateLimitManager()
 
+	public readonly token: string;
+
 	constructor(token: string)
 	{
 		this.headers = {
@@ -51,6 +53,8 @@ export class RestClient
 			"User-Agent": AGENT,
 			"X-RateLimit-Precision": "millisecond"
 		}
+
+		this.token = token;
 	}
 	
 	public get<T extends unknown>(path: string): Promise<T>
@@ -117,11 +121,6 @@ export class RestClient
 }
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-
-interface ErrorResponse
-{
-	error: string
-}
 
 interface Queue
 {

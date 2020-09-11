@@ -2,7 +2,7 @@ import { validateIntegerRange, assert } from "../../deps.ts";
 export type GenericFunction = (...args: any[]) => any;
 
 export interface WrappedFunction extends Function {
-listener: GenericFunction;
+	listener: GenericFunction;
 }
 /**
  * See also https://nodejs.org/api/events.html
@@ -195,21 +195,84 @@ export default class TypedEmitter<E extends string | symbol, D>
 	 */
 	public on(
 		eventName: E,
-		listener: GenericFunction | WrappedFunction,
-	): this
+		listener?: GenericFunction | WrappedFunction,
+	): Function
 	{
-		return this.addListener(eventName, listener);
+		// standard behavior
+		if (listener)
+		{
+			this.addListener(eventName, listener);
+			return () => this;
+		}
+
+		// if used as decorator
+		const emitter = this;
+		return function(
+			parent: Object | Function,
+			___: string,
+			executor: PropertyDescriptor
+		)
+		{
+			// is a method
+			if (typeof parent == "object")
+				emitter.addListener(eventName, executor.value);
+
+			// is a class
+			else if (typeof parent == "function")
+			{
+				Object.getOwnPropertyNames(parent.prototype).forEach((key: string) =>
+				{
+					const descriptor = Object.getOwnPropertyDescriptor(parent.prototype, key);
+					if (isConstructor(descriptor?.value))
+						return;
+					emitter.addListener(eventName, descriptor?.value)
+				});
+			}
+		}
 	}
 
 	/**
 	 * Adds a one-time listener function for the event named eventName. The next
 	 * time eventName is triggered, this listener is removed and then invoked.
 	 */
-	public once(eventName: E, listener: GenericFunction): this
+	public once(eventName: E, listener?: GenericFunction): Function
 	{
-		const wrapped: WrappedFunction = this.onceWrap(eventName, listener);
-		this.on(eventName, wrapped);
-		return this;
+		// standard behavior
+		if (listener)
+		{
+			const wrapped: WrappedFunction = this.onceWrap(eventName, listener);
+			this.on(eventName, wrapped);
+			return () => this;
+		}
+		
+		// if used as decorator
+		const emitter = this;
+		return function(
+			parent: Object | Function,
+			___: string,
+			executor: PropertyDescriptor
+		)
+		{
+			// is a method
+			if (typeof parent == "object")
+			{
+				const wrapped = emitter.onceWrap(eventName, executor.value);
+				emitter.addListener(eventName, wrapped);
+			}
+
+			// is a class
+			else if (typeof parent == "function")
+			{
+			Object.getOwnPropertyNames(parent.prototype).forEach((key: string) =>
+			{
+				const descriptor = Object.getOwnPropertyDescriptor(parent.prototype, key);
+				if (isConstructor(descriptor?.value))
+					return;
+				const wrapped = emitter.onceWrap(eventName, descriptor?.value);
+				emitter.addListener(eventName, wrapped);
+			});
+			}
+		}
 	}
 
 	// Wrapped function that calls TypedEmitter.removeListener(eventName, self) on execution.
@@ -375,9 +438,9 @@ export { TypedEmitter };
  * will resolve with an array of all the arguments emitted to the given event.
  */
 export function once(
-emitter: TypedEmitter<string, unknown> | EventTarget,
-name: string,
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	emitter: TypedEmitter<string, unknown> | EventTarget,
+	name: string,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]>
 {
 	return new Promise((resolve, reject) =>
@@ -399,9 +462,8 @@ name: string,
 		{
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const eventListener = (...args: any[]): void => {
-				if (errorListener !== undefined) {
-				emitter.removeListener("error", errorListener);
-				}
+				if (errorListener !== undefined)
+					emitter.removeListener("error", errorListener);
 				resolve(args);
 			};
 			let errorListener: GenericFunction;
@@ -453,8 +515,8 @@ interface AsyncInterable
  * emitted event arguments.
  */
 export function on<E extends string>(
-emitter: TypedEmitter<string, unknown>,
-event: E,
+	emitter: TypedEmitter<string, unknown>,
+	event: E,
 ): AsyncInterable {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const unconsumedEventValues: any[] = [];
@@ -552,3 +614,10 @@ event: E,
 	}
 }
 export const captureRejectionSymbol = Symbol.for("nodejs.rejection");
+
+function isConstructor(f: Function)
+{
+	try { Reflect.construct(String, [], f) }
+	catch { return false }
+	return true;
+}

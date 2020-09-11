@@ -1,12 +1,12 @@
-import { RestClient, SocketClient, MessageRes, ReadyRes } from "../mod.ts";
-import { green, yellow, red } from "../deps.ts";
+import { RestClient, SocketClient, MessageRes } from "../mod.ts";
+import { green, yellow } from "../deps.ts";
 import { TOKEN } from "../env.ts";
 
 const rest = new RestClient(TOKEN);
 
-const { url } = await rest.get<{ url: string }>("gateway/bot");
+const ws = new SocketClient(rest);
 
-const ws = new SocketClient(TOKEN, url);
+ws.on("DEBUG", ({ message }) => console.log(green("[DEBUG] [WS] ") + yellow(message)));
 
 ws.on("MESSAGE_CREATE", async (message: MessageRes) =>
 {
@@ -20,13 +20,11 @@ ws.on("MESSAGE_CREATE", async (message: MessageRes) =>
 		rest.put(`channels/${message.channel_id}/messages/${message.id}/reactions/😳/@me`);
 });
 
-ws.on("READY", (data: ReadyRes) =>
+@ws.on("MESSAGE_CREATE")
+class test
 {
-	console.log([
-		red("=".repeat(50)),
-		yellow(`Connected to websocket as ${green(data.user.username)}#${green(data.user.discriminator)}`),
-		yellow(`Gateway version: ${green(String(data.v))}`),
-		yellow(`Guild count: ${green(String(data.guilds.length))}`),
-		red("=".repeat(50)),
-	].join("\n"));
-});
+	works(message: MessageRes)
+	{
+		console.log(message.author.username);
+	}
+}
