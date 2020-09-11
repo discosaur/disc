@@ -21,7 +21,7 @@ export class RestUser
 	}
 }
 
-export class RestMeUser
+export class RestClientUser
 {
 	private readonly _rest: RestClient;
 

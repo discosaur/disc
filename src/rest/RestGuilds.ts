@@ -1,13 +1,14 @@
 import {
 	GuildRes,
 	GuildModifyReq,
-	EmojiRes,
+	IEmoji,
 	CreateEmojiReq,
 	ModifyEmojiReq,
 	AuditLogOptionsReq,
 	AuditLogRes,
 	SomeObject, IGuildMember
 } from "../typings/mod.ts";
+import { IGuildMemberModifyReq } from "../typings/Request/GuildMember.ts";
 import { RestClient } from "./mod.ts";
 
 export class RestGuilds
@@ -54,7 +55,7 @@ export class RestGuild
 			: this.route);
 	}
 
-	public Modify(opts: GuildModifyReq): Promise<GuildRes>
+	public Modify(opts: Partial<GuildModifyReq>): Promise<GuildRes>
 	{
 		return this._rest.patch<GuildRes>(this.route, opts);
 	}
@@ -110,9 +111,9 @@ export class RestGuild
 		return this._rest.put<unknown>(`${this.route}/members/${id}`, opts);
 	}
 
-	public modifyMember(id: string, opts: SomeObject): Promise<unknown>
+	public modifyMember(id: string, opts: Partial<IGuildMemberModifyReq>): Promise<unknown>
 	{
-		return this._rest.patch<unknown>(`${this.route}/members/${id}`, opts);
+		return this._rest.patch<IGuildMemberModifyReq>(`${this.route}/members/${id}`, opts);
 	}
 
 	public removeMember(id: string): Promise<unknown>
@@ -242,22 +243,22 @@ export class RestGuild
 	//#endregion
 
 	//#region Emojis
-	public listEmojis(): Promise<EmojiRes[]>
+	public listEmojis(): Promise<IEmoji[]>
 	{
-		return this._rest.get<EmojiRes[]>(this.route + "/emojis");
+		return this._rest.get<IEmoji[]>(this.route + "/emojis");
 	}
 
-	public getEmoji(id: string): Promise<EmojiRes>
+	public getEmoji(id: string): Promise<IEmoji>
 	{
-		return this._rest.get<EmojiRes>(`${this.route}/emojis/${id}`);
+		return this._rest.get<IEmoji>(`${this.route}/emojis/${id}`);
 	}
 
-	public createEmoji(id: string, opts: CreateEmojiReq): Promise<EmojiRes>
+	public createEmoji(opts: CreateEmojiReq): Promise<IEmoji>
 	{
-		return this._rest.post<EmojiRes>(`${this.route}/emojis/${id}`, opts);
+		return this._rest.post<IEmoji>(`${this.route}/emojis`, opts);
 	}
 
-	public modifyEmoji(id: string, opts: ModifyEmojiReq): Promise<EmojiRes>
+	public modifyEmoji(id: string, opts: ModifyEmojiReq): Promise<IEmoji>
 	{
 		return this._rest.patch(`${this.route}/emojis/${id}`, opts);
 	}
@@ -284,7 +285,7 @@ export class RestGuild
 		return this._rest.get<void>(this.route + "/vanity-url");
 	}
 
-	public getAuditLog(opts?: AuditLogOptionsReq): Promise<AuditLogRes>
+	public getAuditLog(/*opts?: AuditLogOptionsReq*/): Promise<AuditLogRes>
 	{
 		let nRoute = this.route;
 		
