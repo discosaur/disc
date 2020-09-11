@@ -1,5 +1,5 @@
-import { RestClient, SocketClient, MessageRes, ReadyRes } from "../mod.ts";
-import { green, yellow, red } from "../deps.ts";
+import { RestClient, SocketClient, MessageRes } from "../mod.ts";
+import { green, yellow } from "../deps.ts";
 import { TOKEN } from "../env.ts";
 
 const rest = new RestClient(TOKEN);
@@ -19,3 +19,12 @@ ws.on("MESSAGE_CREATE", async (message: MessageRes) =>
 	else if (message.content == "y")
 		rest.put(`channels/${message.channel_id}/messages/${message.id}/reactions/😳/@me`);
 });
+
+@ws.on("MESSAGE_CREATE")
+class test
+{
+	works(message: MessageRes)
+	{
+		console.log(message.author.username);
+	}
+}

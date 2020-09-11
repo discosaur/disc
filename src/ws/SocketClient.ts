@@ -172,7 +172,10 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 						this.setup();
 					}
 					else
+					{
 						this.heartbeat();
+						this.session.acknowledged = false;
+					}
 				}, (data.d as { heartbeat_interval: number }).heartbeat_interval);
 				break;
 
