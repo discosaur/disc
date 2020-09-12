@@ -1,39 +1,92 @@
 import { AGENT, red } from "../../deps.ts";
 import { SomeObject } from "../typings/mod.ts";
 
-class RestRateLimitManager
-{
-	public queues = new Map<string, Queue>()
+type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-	public set(ms: number, route: string)
+interface RateLimitHeaders
+{
+	"x-ratelimit-remaining": number
+	"x-ratelimit-reset": number
+	"x-ratelimit-reset-after": number
+	"x-ratelimit-bucket": string
+	"x-ratelimit-global"?: number
+}
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+class Counter
+{
+	constructor(private _value = 0) { }
+	public get value()
 	{
-		this.queues.set(route, {
-			okay: false,
-			okayWhen: Date.now() + ms
-		});
+		return this._value;
 	}
+	public increment(val = 1): number
+	{
+		return this.change(val);
+	}
+	public decrement(val = 1): number
+	{
+		return this.change(-val);
+	}
+	private onTimer = false;
+	public incrementTimed(timeout: number, val = 1)
+	{
+		if (this.onTimer)
+			return;
+		this.onTimer = true;
+		setTimeout(() =>
+		{
+			this.increment(val);
+			this.onTimer = false;
+		}, timeout);
+	}
+	private change(val: number): number
+	{
+		this._value += val;
+		return this._value;
+	}
+}
+
+class RateLimitManager
+{
+	public reset_after = new Map<string, number>()
+	public remaining_constant = new Map<string, number>()
+	public remaining = new Map<string, Counter>()
+
+	public set(info: RateLimitHeaders, route: string)
+	{
+		if (!this.remaining.has(route))
+		{
+			this.remaining.set(route, new Counter(info["x-ratelimit-remaining"]));
+			this.remaining_constant.set(route, info["x-ratelimit-remaining"]);
+			this.reset_after.set(route, info["x-ratelimit-reset-after"] * 1000);
+		}
+	}
+
 	public async okay(route: string)
 	{
-		const queue = this.queues.get(route);
+		const remaining = this.remaining.get(route);
 
-		if (!queue)
+		if (remaining == undefined)
+			return;
+
+		async function tryToRun(manager: RateLimitManager, remaining: Counter)
 		{
-			this.queues.set(route, { okay: true, okayWhen: Date.now() })
-			return;
+			if (remaining.value == 0)
+			{
+				const timeout = manager.reset_after.get(route)!;
+				remaining.incrementTimed(timeout, manager.remaining_constant.get(route));
+				await sleep(timeout);
+				await tryToRun(manager, remaining);
+			}
+			else
+			{
+				remaining.decrement();
+				return;
+			}
 		}
-
-		if (queue.okay)
-			return;
-
-		const timeout = queue.okayWhen - Date.now();
-
-		if (timeout <= 0)
-		{
-			this.queues.set(route, { okay: true, okayWhen: Date.now() })
-			return;
-		}
-
-		await sleep(timeout);
+		await tryToRun(this, remaining);
 	}
 }
 
@@ -41,7 +94,7 @@ export class RestClient
 {
 	private readonly _endpoint: string = "https://discord.com/api/v6/";
 	private headers: Record<string, string>;
-	private manager = new RestRateLimitManager()
+	private manager = new RateLimitManager()
 
 	constructor(public token: string)
 	{
@@ -101,8 +154,8 @@ export class RestClient
 				: undefined
 		}
 		
-		if (rateLimitInfo["x-ratelimit-remaining"] == 0)
-			this.manager.set(rateLimitInfo["x-ratelimit-reset-after"] * 1000, baseRoute);
+		if (rateLimitInfo["x-ratelimit-reset-after"])
+			this.manager.set(rateLimitInfo, baseRoute);
 
 		if (res.status == 429)
 			console.log(red("oopsie! ratelimits :( WIP"));
@@ -116,22 +169,3 @@ export class RestClient
 			return {} as T;
 	}
 }
-
-type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-
-interface Queue
-{
-	okay: boolean
-	okayWhen: number
-}
-
-interface RateLimitHeaders
-{
-	"x-ratelimit-remaining": number
-	"x-ratelimit-reset": number
-	"x-ratelimit-reset-after": number
-	"x-ratelimit-bucket": string
-	"x-ratelimit-global"?: number
-}
-
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
