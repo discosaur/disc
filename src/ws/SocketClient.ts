@@ -28,16 +28,16 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 
 	private async setup(resuming?: boolean)
 	{
-		const { url } = await this.rest.get<{ url: string }>("gateway/bot");
+		const res = await this.rest.get<{ url: string }>("gateway/bot");
 
-		if (!url)
-			throw new Error("Could not fetch websocket endpoint");
+		if (res.error)
+			throw new Error(`Error fetching gateway endpoint: ${res.error.message}, code: ${res.error.code}`);
 
 		this.emit("DEBUG", { message: "Trying to connect to WebSocket..." });
 
 		try
 		{
-			this.socket = await connectWebSocket(url + "?v=6&encoding=json");
+			this.socket = await connectWebSocket(res.url + "?v=6&encoding=json");
 
 			const messages = async (): Promise<void> =>
 			{

@@ -1,15 +1,27 @@
-import { AGENT, red } from "../../deps.ts";
+import { AGENT } from "../../deps.ts";
 import { SomeObject } from "../typings/mod.ts";
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+export interface RestError
+{
+	error: {
+		message: string
+		code: number
+	} | undefined
+}
+
+// the only headers required to manage ratelimits
 interface RateLimitHeaders
 {
-	"x-ratelimit-remaining": number
-	"x-ratelimit-reset": number
-	"x-ratelimit-reset-after": number
-	"x-ratelimit-bucket": string
-	"x-ratelimit-global"?: number
+	"x-ratelimit-remaining": string | null
+	"x-ratelimit-reset-after": string | null
+}
+
+interface ParsedHeaders
+{
+	remaining: number
+	reset_after: number
 }
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -48,37 +60,49 @@ class Counter
 	}
 }
 
+interface Queue
+{
+	reset_after: number
+	remaining_constant: number
+	remaining: Counter
+}
+
 class RateLimitManager
 {
-	public reset_after = new Map<string, number>()
-	public remaining_constant = new Map<string, number>()
-	public remaining = new Map<string, Counter>()
+	public queues = new Map<string, Queue>()
 
-	public set(info: RateLimitHeaders, route: string)
+	public has(route: string)
 	{
-		if (!this.remaining.has(route))
-		{
-			this.remaining.set(route, new Counter(info["x-ratelimit-remaining"]));
-			this.remaining_constant.set(route, info["x-ratelimit-remaining"]);
-			this.reset_after.set(route, info["x-ratelimit-reset-after"] * 1000);
-		}
+		return this.queues.has(route);
+	}
+
+	public set(route: string, info: ParsedHeaders)
+	{
+		this.queues.set(
+			route,
+			{
+				reset_after: info.reset_after * 1000,
+				remaining_constant: info.remaining,
+				remaining: new Counter(info.remaining)
+			}
+		);
 	}
 
 	public async okay(route: string)
 	{
-		const remaining = this.remaining.get(route);
+		const queue = this.queues.get(route);
 
-		if (remaining == undefined)
+		if (!queue)
 			return;
 
-		async function tryToRun(manager: RateLimitManager, remaining: Counter)
+		async function attempt(manager: RateLimitManager, remaining: Counter)
 		{
 			if (remaining.value == 0)
 			{
-				const timeout = manager.reset_after.get(route)!;
-				remaining.incrementTimed(timeout, manager.remaining_constant.get(route));
+				const timeout = manager.queues.get(route)!.reset_after;
+				remaining.incrementTimed(timeout, manager.queues.get(route)!.remaining_constant);
 				await sleep(timeout);
-				await tryToRun(manager, remaining);
+				await attempt(manager, remaining);
 			}
 			else
 			{
@@ -86,7 +110,7 @@ class RateLimitManager
 				return;
 			}
 		}
-		await tryToRun(this, remaining);
+		await attempt(this, queue!.remaining);
 	}
 }
 
@@ -110,32 +134,32 @@ export class RestClient
 		this.token = token;
 	}
 	
-	public get<T extends unknown>(path: string): Promise<T>
+	public get<T extends unknown>(path: string): Promise<T & RestError>
 	{
 		return this.do("GET", path);
 	}
 	
-	public post<T extends unknown>(path: string, body?: SomeObject): Promise<T>
+	public post<T extends unknown>(path: string, body?: SomeObject): Promise<T & RestError>
 	{
 		return this.do("POST", path, body);
 	}
 
-	public patch<T extends unknown>(path: string, body: SomeObject): Promise<T>
+	public patch<T extends unknown>(path: string, body: SomeObject): Promise<T & RestError>
 	{
 		return this.do("PATCH", path, body);
 	}
 
-	public put<T extends unknown>(path: string, body?: SomeObject): Promise<T>
+	public put<T extends unknown>(path: string, body?: SomeObject): Promise<T & RestError>
 	{
 		return this.do("PUT", path, body);
 	}
 
-	public delete<T extends unknown>(path: string): Promise<T>
+	public delete<T extends unknown>(path: string): Promise<T & RestError>
 	{
 		return this.do("DELETE", path);
 	}
 
-	protected async do<T extends unknown>(method: Method, path: string, body?: SomeObject): Promise<T>
+	protected async do<T extends unknown>(method: Method, path: string, body?: SomeObject): Promise<T & RestError>
 	{
 
 		const baseRoute = path.split("/").slice(0, 2).join("/");
@@ -148,27 +172,50 @@ export class RestClient
 			body: JSON.stringify(body)
 		});
 
-		const rateLimitInfo: RateLimitHeaders = {
-			"x-ratelimit-remaining": 	Number(res.headers.get("x-ratelimit-remaining")),
-			"x-ratelimit-reset": 		Number(res.headers.get("x-ratelimit-reset")),
-			"x-ratelimit-reset-after": 	Number(res.headers.get("x-ratelimit-reset-after")),
-			"x-ratelimit-bucket": 		res.headers.get("x-ratelimit-bucket") as string,
-			"x-ratelimit-global": 		res.headers.get("x-ratelimit-global")
-				? Number(res.headers.get("x-ratelimit-global"))
-				: undefined
+		if (!this.manager.has(baseRoute))
+		{
+			const limits: RateLimitHeaders = {
+				"x-ratelimit-remaining": 	res.headers.get("x-ratelimit-remaining"),
+				"x-ratelimit-reset-after": 	res.headers.get("x-ratelimit-reset-after")
+			}
+			
+			// check if headers were actually present
+			if (limits["x-ratelimit-reset-after"] != null)
+				this.manager.set(
+					baseRoute,
+					{
+						remaining: 		Number(limits["x-ratelimit-remaining"]),
+						reset_after: 	Number(limits["x-ratelimit-reset-after"])
+					}
+				);
 		}
-		
-		if (rateLimitInfo["x-ratelimit-reset-after"])
-			this.manager.set(rateLimitInfo, baseRoute);
 
 		if (res.status == 429)
-			console.log(red("oopsie! ratelimits :( WIP"));
-		if (res.status >= 400)
-			throw new Error(res.statusText);
+			console.log("Got ratelimited for some reason :(");
 
-		else if (res.body != null)
-			return res.json();
+		// http code >= 400
+		if (res.status >= 400)
+			return {
+				error: {
+					code: res.status,
+					message: res.statusText
+				}
+			} as T & RestError;
+
+		// http code < 400
 		else
-			return {} as T;
+		{
+			// no body, would crash deno if tried to parse
+			if (res.body == null)
+				return {
+					error: undefined
+				} as T & RestError;
+
+			else
+				return {
+					...(await res.json()),
+					error: undefined
+				};
+		}
 	}
 }
