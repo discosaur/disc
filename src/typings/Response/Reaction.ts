@@ -1,8 +1,8 @@
-import { EmojiRes } from "./mod.ts";
+import { IEmoji } from "../mod.ts";
 
 export interface ReactionRes
 {
 	count: number
 	me: boolean
-	emoji: EmojiRes
+	emoji: IEmoji
 }

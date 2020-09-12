@@ -4,3 +4,5 @@ export * from "./Embed.ts";
 export * from "./Invite.ts";
 export * from "./TypedEmitter.ts";
 export * from "./Misc.ts";
+export * from "./GuildMember.ts";
+export * from "./Emoji.ts";

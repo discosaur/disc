@@ -1,13 +1,14 @@
 import {
 	GuildRes,
 	GuildModifyReq,
-	EmojiRes,
+	IEmoji,
 	CreateEmojiReq,
 	ModifyEmojiReq,
 	AuditLogOptionsReq,
 	AuditLogRes,
-	SomeObject
+	SomeObject, IGuildMember
 } from "../typings/mod.ts";
+import { IGuildMemberModifyReq } from "../typings/Request/GuildMember.ts";
 import { RestClient } from "./mod.ts";
 
 export class RestGuilds
@@ -45,6 +46,7 @@ export class RestGuild
 		this.id = id;
 		this.route = "guilds/" + this.id;
 	}
+
 	//#region General
 	public Get(onlyPreview?: boolean): Promise<GuildRes>
 	{
@@ -53,7 +55,7 @@ export class RestGuild
 			: this.route);
 	}
 
-	public Modify(opts: GuildModifyReq): Promise<GuildRes>
+	public Modify(opts: Partial<GuildModifyReq>): Promise<GuildRes>
 	{
 		return this._rest.patch<GuildRes>(this.route, opts);
 	}
@@ -86,14 +88,22 @@ export class RestGuild
 	//#endregion
 
 	//#region Members
-	public getMembers(): Promise<unknown>
+	public getMembers(limit?: number | "max"): Promise<IGuildMember[]>
 	{
-		return this._rest.get<unknown>(this.route + "/members");
+		limit ??= 1;
+		if (limit == "max")
+			limit = 100;
+		else if (limit > 100)
+			throw new Error("Limit can not be greater than 100");
+		else if (limit < 1)
+			throw new Error("Limit can not be less than 1");
+		
+		return this._rest.get<IGuildMember[]>(`${this.route}/members?limit=${limit}`);
 	}
 
-	public getMember(id: string): Promise<unknown>
+	public getMember(id: string): Promise<IGuildMember>
 	{
-		return this._rest.get<unknown>(`${this.route}/members/${id}`);
+		return this._rest.get<IGuildMember>(`${this.route}/members/${id}`);
 	}
 
 	public addMember(id: string, opts: SomeObject): Promise<unknown>
@@ -101,9 +111,9 @@ export class RestGuild
 		return this._rest.put<unknown>(`${this.route}/members/${id}`, opts);
 	}
 
-	public modifyMember(id: string, opts: SomeObject): Promise<unknown>
+	public modifyMember(id: string, opts: Partial<IGuildMemberModifyReq>): Promise<unknown>
 	{
-		return this._rest.patch<unknown>(`${this.route}/members/${id}`, opts);
+		return this._rest.patch<IGuildMemberModifyReq>(`${this.route}/members/${id}`, opts);
 	}
 
 	public removeMember(id: string): Promise<unknown>
@@ -233,22 +243,22 @@ export class RestGuild
 	//#endregion
 
 	//#region Emojis
-	public listEmojis(): Promise<EmojiRes[]>
+	public listEmojis(): Promise<IEmoji[]>
 	{
-		return this._rest.get<EmojiRes[]>(this.route + "/emojis");
+		return this._rest.get<IEmoji[]>(this.route + "/emojis");
 	}
 
-	public getEmoji(id: string): Promise<EmojiRes>
+	public getEmoji(id: string): Promise<IEmoji>
 	{
-		return this._rest.get<EmojiRes>(`${this.route}/emojis/${id}`);
+		return this._rest.get<IEmoji>(`${this.route}/emojis/${id}`);
 	}
 
-	public createEmoji(id: string, opts: CreateEmojiReq): Promise<EmojiRes>
+	public createEmoji(opts: CreateEmojiReq): Promise<IEmoji>
 	{
-		return this._rest.post<EmojiRes>(`${this.route}/emojis/${id}`, opts);
+		return this._rest.post<IEmoji>(`${this.route}/emojis`, opts);
 	}
 
-	public modifyEmoji(id: string, opts: ModifyEmojiReq): Promise<EmojiRes>
+	public modifyEmoji(id: string, opts: ModifyEmojiReq): Promise<IEmoji>
 	{
 		return this._rest.patch(`${this.route}/emojis/${id}`, opts);
 	}
@@ -275,7 +285,7 @@ export class RestGuild
 		return this._rest.get<void>(this.route + "/vanity-url");
 	}
 
-	public getAuditLog(opts?: AuditLogOptionsReq): Promise<AuditLogRes>
+	public getAuditLog(/*opts?: AuditLogOptionsReq*/): Promise<AuditLogRes>
 	{
 		let nRoute = this.route;
 		

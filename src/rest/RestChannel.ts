@@ -45,9 +45,9 @@ export class RestChannel
 		return this._rest.get<MessageRes>(`${this.route}/messages/${id}`);
 	}
 
-	public createMessage(opts: MessageReq): Promise<MessageRes>
+	public createMessage(opts: Partial<MessageReq>): Promise<MessageRes>
 	{
-		// TODO: WARNING Before using this endpoint, you must connect to and identify with a gateway at least once.
+		// WARNING: Before using this endpoint, you must connect to and identify with a gateway at least once.
 		return this._rest.post<MessageRes>(`${this.route}/messages`, opts);
 	}
 	

@@ -3,7 +3,6 @@ export * from "./AuditLog.ts";
 export * from "./Channel.ts";
 export * from "./ClientUser.ts";
 export * from "./Connection.ts";
-export * from "./Emoji.ts";
 export * from "./Guild.ts";
 export * from "./Member.ts";
 export * from "./Message.ts";

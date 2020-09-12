@@ -1,3 +1,4 @@
+import { IEmoji } from "../Emoji.ts";
 import { Snowflake } from "../mod.ts";
 
 // from get users/@me/guilds
@@ -12,23 +13,16 @@ interface SimpleGuildRes
 }
 
 // from get guilds/714930431065325609
-export interface GuildRes extends SimpleGuildRes
+export interface GuildRes /*extends SimpleGuildRes*/
 {
-	id: Readonly<Snowflake>,
+	id: Snowflake, 
 	name: string,
 	description: string,
+	icon?: string,
 	splash: unknown | null,
 	discovery_splash : unknown | null,
 	features: string[],
-	emojis: {
-		name: string,
-		roles: unknown[],
-		id: string,
-		require_colons: boolean,
-		managed: boolean,
-		animated: boolean,
-		available: boolean
-	}[],
+	emojis: IEmoji[],
 	banner: string | null,
 	owner_id: string,
 	application_id: string | null

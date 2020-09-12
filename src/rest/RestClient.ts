@@ -96,7 +96,9 @@ export class RestClient
 	private headers: Record<string, string>;
 	private manager = new RateLimitManager()
 
-	constructor(public token: string)
+	public readonly token: string;
+
+	constructor(token: string)
 	{
 		this.headers = {
 			"Authorization": "Bot " + token,
@@ -104,6 +106,8 @@ export class RestClient
 			"User-Agent": AGENT,
 			"X-RateLimit-Precision": "millisecond"
 		}
+
+		this.token = token;
 	}
 	
 	public get<T extends unknown>(path: string): Promise<T>
@@ -159,7 +163,6 @@ export class RestClient
 
 		if (res.status == 429)
 			console.log(red("oopsie! ratelimits :( WIP"));
-
 		if (res.status >= 400)
 			throw new Error(res.statusText);
 
