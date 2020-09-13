@@ -122,7 +122,7 @@ export enum SocketIntentBits {
 /**
  * https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events
  */
-export enum SocketDispatchEvents {
+export enum SocketEvents {
 	Ready = "READY",
 	Resumed = "RESUMED",
 	ChannelCreate = "CHANNEL_CREATE",
@@ -159,49 +159,10 @@ export enum SocketDispatchEvents {
 	VoiceStateUpdate = "VOICE_STATE_UPDATE",
 	VoiceServerUpdate = "VOICE_SERVER_UPDATE",
 	WebhooksUpdate = "WEBHOOKS_UPDATE",
+	// not discord defined, but existing on the socket client
+	Debug = "DEBUG",
+	Invalidated = "INVALIDATED"
 }
-
-export type SocketDispatchEventsName =
-	// raw discord events
-	| SocketDispatchEvents.Ready
-	| SocketDispatchEvents.Resumed
-	| SocketDispatchEvents.ChannelCreate
-	| SocketDispatchEvents.ChannelUpdate
-	| SocketDispatchEvents.ChannelDelete
-	| SocketDispatchEvents.ChannelPinsUpdate
-	| SocketDispatchEvents.GuildCreate
-	| SocketDispatchEvents.GuildUpdate
-	| SocketDispatchEvents.GuildDelete
-	| SocketDispatchEvents.GuildBanAdd
-	| SocketDispatchEvents.GuildBanRemove
-	| SocketDispatchEvents.GuildEmojisUpdate
-	| SocketDispatchEvents.GuildIntegrationsUpdate
-	| SocketDispatchEvents.GuildMemberAdd
-	| SocketDispatchEvents.GuildMemberRemove
-	| SocketDispatchEvents.GuildMemberUpdate
-	| SocketDispatchEvents.GuildMembersChunk
-	| SocketDispatchEvents.GuildRoleCreate
-	| SocketDispatchEvents.GuildRoleUpdate
-	| SocketDispatchEvents.GuildRoleDelete
-	| SocketDispatchEvents.InviteCreate
-	| SocketDispatchEvents.InviteDelete
-	| SocketDispatchEvents.MessageCreate
-	| SocketDispatchEvents.MessageUpdate
-	| SocketDispatchEvents.MessageDelete
-	| SocketDispatchEvents.MessageDeleteBulk
-	| SocketDispatchEvents.MessageReactionAdd
-	| SocketDispatchEvents.MessageReactionRemove
-	| SocketDispatchEvents.MessageReactionRemoveAll
-	| SocketDispatchEvents.MessageReactionRemoveEmoji
-	| SocketDispatchEvents.PresenceUpdate
-	| SocketDispatchEvents.TypingStart
-	| SocketDispatchEvents.UserUpdate
-	| SocketDispatchEvents.VoiceStateUpdate
-	| SocketDispatchEvents.VoiceServerUpdate
-	| SocketDispatchEvents.WebhooksUpdate
-	// self-defined events for utility
-	| "INVALIDATED"
-	| "DEBUG";
 
 export type SocketSendPayload =
 	| SocketHeartbeat
@@ -503,12 +464,12 @@ export interface SocketMessageDeleteBulkDispatch
 /**
  * https://discord.com/developers/docs/topics/gateway#message-reaction-add
  */
-export type SocketMessageReactionAddDispatch = ReactionData<SocketDispatchEvents.MessageReactionAdd>;
+export type SocketMessageReactionAddDispatch = ReactionData<SocketEvents.MessageReactionAdd>;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-reaction-remove
  */
-export type SocketMessageReactionRemoveDispatch = ReactionData<SocketDispatchEvents.MessageReactionRemove, "member">;
+export type SocketMessageReactionRemoveDispatch = ReactionData<SocketEvents.MessageReactionRemove, "member">;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-reaction-remove-all
@@ -682,11 +643,11 @@ type NonDispatchPayload = Omit<BasePayload, "t">;
 interface DataPayload extends BasePayload
 {
 	op: SocketOPCodes.EVENT;
-	t: SocketDispatchEvents;
+	t: SocketEvents;
 	d: SocketDispatchPayload;
 }
 
-type ReactionData<E extends SocketDispatchEvents, O extends string = never> =
+type ReactionData<E extends SocketEvents, O extends string = never> =
 	Omit<
 		{
 			user_id: string;

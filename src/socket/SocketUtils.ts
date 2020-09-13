@@ -1,8 +1,8 @@
-import { SocketDispatchEventsName, SomeObject } from "../typings/mod.ts";
+import { SocketEventsName, SomeObject } from "../typings/mod.ts";
 
 export interface SocketData
 {
-	t: SocketDispatchEventsName,
+	t: SocketEventsName,
 	s: number,
 	op: number,
 	d: SomeObject
