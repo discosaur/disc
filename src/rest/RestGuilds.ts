@@ -1,10 +1,10 @@
 import {
 	APIGuild,
 	APIEmoji,
-	RestPostAPIGuildEmojiJSONBody,
-	RestPatchAPIGuildEmojiJSONBody,
-	RestGetAPIAuditLogQuery,
-	RestPutAPIGuildMemberJSONBody,
+	PostAPIGuildEmojiJSONBody,
+	PatchAPIGuildEmojiJSONBody,
+	GetAPIAuditLogQuery,
+	PutAPIGuildMemberJSONBody,
 	SomeObject,
 	APIGuildMember,
 	APIAuditLog
@@ -113,7 +113,7 @@ export class RestGuild
 		return this._rest.put<unknown>(`${this.route}/members/${id}`, opts);
 	}
 
-	public modifyMember(id: string, opts: RestPutAPIGuildMemberJSONBody)
+	public modifyMember(id: string, opts: PutAPIGuildMemberJSONBody)
 	{
 		return this._rest.patch<APIGuildMember>(`${this.route}/members/${id}`, opts);
 	}
@@ -255,12 +255,12 @@ export class RestGuild
 		return this._rest.get<APIEmoji>(`${this.route}/emojis/${id}`);
 	}
 
-	public createEmoji(opts: RestPostAPIGuildEmojiJSONBody)
+	public createEmoji(opts: PostAPIGuildEmojiJSONBody)
 	{
 		return this._rest.post<APIEmoji>(`${this.route}/emojis`, opts);
 	}
 
-	public modifyEmoji(id: string, opts: RestPatchAPIGuildEmojiJSONBody)
+	public modifyEmoji(id: string, opts: PatchAPIGuildEmojiJSONBody)
 	{
 		return this._rest.patch(`${this.route}/emojis/${id}`, opts);
 	}
@@ -287,7 +287,7 @@ export class RestGuild
 		return this._rest.get<void>(this.route + "/vanity-url");
 	}
 
-	public getAuditLog(opts?: RestGetAPIAuditLogQuery)
+	public getAuditLog(opts?: GetAPIAuditLogQuery)
 	{
 		let nRoute = this.route;
 		

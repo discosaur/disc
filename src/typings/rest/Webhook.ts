@@ -3,61 +3,61 @@ import type { APIAllowedMentionsSend, APIEmbed, APIMessage, APIWebhook } from ".
 /**
  * https://discord.com/developers/docs/resources/webhook#create-webhook
  */
-export interface RestPostAPIChannelWebhookJSONBody {
+export interface PostAPIChannelWebhookJSONBody {
 	name: string;
 	avatar?: string | null;
 }
 
-export type RestPostAPIChannelWebhookResult = APIWebhook;
+export type PostAPIChannelWebhookResult = APIWebhook;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#get-channel-webhooks
  */
-export type RestGetAPIChannelWebhooksResult = APIWebhook[];
+export type GetAPIChannelWebhooksResult = APIWebhook[];
 
 /**
  * https://discord.com/developers/docs/resources/webhook#get-guild-webhooks
  */
-export type RestGetAPIGuildWebhooksResult = APIWebhook[];
+export type GetAPIGuildWebhooksResult = APIWebhook[];
 
 /**
  * https://discord.com/developers/docs/resources/webhook#get-webhook
  */
-export type RestGetAPIWebhookResult = APIWebhook;
+export type GetAPIWebhookResult = APIWebhook;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#get-webhook-with-token
  */
-export type RestGetAPIWebhookWithTokenResult = Omit<APIWebhook, "user">;
+export type GetAPIWebhookWithTokenResult = Omit<APIWebhook, "user">;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#modify-webhook
  */
-export interface RestPatchAPIWebhookJSONBody {
+export interface PatchAPIWebhookJSONBody {
 	name?: string;
 	avatar?: string | null;
 	channel_id?: string;
 }
 
-export type RestPatchAPIWebhookResult = APIWebhook;
+export type PatchAPIWebhookResult = APIWebhook;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token
  */
-export type RestPatchAPIWebhookWithTokenJSONBody = Omit<RestPatchAPIWebhookJSONBody, "channel_id">;
+export type PatchAPIWebhookWithTokenJSONBody = Omit<PatchAPIWebhookJSONBody, "channel_id">;
 
-export type RestPatchAPIWebhookWithTokenResult = Omit<APIWebhook, "user">;
+export type PatchAPIWebhookWithTokenResult = Omit<APIWebhook, "user">;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#delete-webhook
  */
-export type RestDeleteAPIWebhookResult = never;
-export type RestDeleteAPIWebhookWithTokenResult = never;
+export type DeleteAPIWebhookResult = never;
+export type DeleteAPIWebhookWithTokenResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#execute-webhook
  */
-export interface RestPostAPIWebhookWithTokenJSONBody {
+export interface PostAPIWebhookWithTokenJSONBody {
 	content?: string;
 	username?: string;
 	avatar_url?: string;
@@ -69,7 +69,7 @@ export interface RestPostAPIWebhookWithTokenJSONBody {
 /**
  * https://discord.com/developers/docs/resources/webhook#execute-webhook
  */
-export type RestPostAPIWebhookWithTokenFormDataBody =
+export type PostAPIWebhookWithTokenFormDataBody =
 	| {
 			/**
 			 * JSON stringified message body
@@ -80,7 +80,7 @@ export type RestPostAPIWebhookWithTokenFormDataBody =
 			 */
 			file: unknown;
 	  }
-	| (RestPostAPIWebhookWithTokenJSONBody & {
+	| (PostAPIWebhookWithTokenJSONBody & {
 			/**
 			 * The file contents
 			 */
@@ -90,11 +90,11 @@ export type RestPostAPIWebhookWithTokenFormDataBody =
 /**
  * https://discord.com/developers/docs/resources/webhook#execute-webhook-querystring-params
  */
-export interface RestPostAPIWebhookWithTokenQuery {
+export interface PostAPIWebhookWithTokenQuery {
 	wait?: boolean;
 }
 
-export type RestPostAPIWebhookWithTokenResult = never;
+export type PostAPIWebhookWithTokenResult = never;
 
 /**
  * Received when a call to POST `/webhooks/{webhook.id}/{webhook.token}` receives
@@ -102,14 +102,14 @@ export type RestPostAPIWebhookWithTokenResult = never;
  *
  * @see https://discord.com/developers/docs/resources/webhook#execute-webhook-querystring-params
  */
-export type RestPostAPIWebhookWithTokenWaitResult = APIMessage;
+export type PostAPIWebhookWithTokenWaitResult = APIMessage;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook-querystring-params
  */
-export type RestPostAPIWebhookWithTokenSlackQuery = RestPostAPIWebhookWithTokenQuery;
+export type PostAPIWebhookWithTokenSlackQuery = PostAPIWebhookWithTokenQuery;
 
 /**
  * https://discord.com/developers/docs/resources/webhook#execute-githubcompatible-webhook-querystring-params
  */
-export type RestPostAPIWebhookWithTokenGitHubQuery = RestPostAPIWebhookWithTokenQuery;
+export type PostAPIWebhookWithTokenGitHubQuery = PostAPIWebhookWithTokenQuery;

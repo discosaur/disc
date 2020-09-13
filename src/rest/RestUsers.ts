@@ -1,8 +1,8 @@
 import { RestClient } from "./RestClient.ts";
 import {
 	APIGuild,
-	RestPatchAPICurrentUserJSONBody,
-	RestPatchAPICurrentUserResult,
+	PatchAPICurrentUserJSONBody,
+	PatchAPICurrentUserResult,
 	SomeObject,
 	APIConnection,
 	APIUser
@@ -46,9 +46,9 @@ export class RestClientUser
 	}
 
 	// TODO This has may have params
-	public modify(opts: RestPatchAPICurrentUserJSONBody)
+	public modify(opts: PatchAPICurrentUserJSONBody)
 	{
-		return this._rest.patch<RestPatchAPICurrentUserResult>(this.route, opts);
+		return this._rest.patch<PatchAPICurrentUserResult>(this.route, opts);
 	}
 	//#endregion
 	

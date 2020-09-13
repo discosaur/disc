@@ -3,33 +3,33 @@ import type { APIChannel, APIConnection, APIUser, GuildFeature } from "../mod.ts
 /**
  * https://discord.com/developers/docs/resources/user#get-current-user
  */
-export type RestGetAPICurrentUserResult = APIUser;
+export type GetAPICurrentUserResult = APIUser;
 
 /**
  * https://discord.com/developers/docs/resources/user#get-user
  */
-export type RestGetAPIUserResult = APIUser;
+export type GetAPIUserResult = APIUser;
 
 /**
  * https://discord.com/developers/docs/resources/user#modify-current-user
  */
-export interface RestPatchAPICurrentUserJSONBody {
+export interface PatchAPICurrentUserJSONBody {
 	username?: string;
 	avatar?: string | null;
 }
 
-export type RestPatchAPICurrentUserResult = APIUser;
+export type PatchAPICurrentUserResult = APIUser;
 
 /**
  * https://discord.com/developers/docs/resources/user#get-current-user-guilds
  */
-export interface RestGetAPICurrentUserGuildsQuery {
+export interface GetAPICurrentUserGuildsQuery {
 	before?: string;
 	after?: string;
 	limit?: number;
 }
 
-export interface RestAPIPartialCurrentUserGuild {
+export interface APIPartialCurrentUserGuild {
 	id: string;
 	name: string;
 	icon: string | null;
@@ -42,23 +42,23 @@ export interface RestAPIPartialCurrentUserGuild {
 	permissions_new: string;
 }
 
-export type RestGetAPICurrentUserGuildsResult = RestAPIPartialCurrentUserGuild[];
+export type GetAPICurrentUserGuildsResult = APIPartialCurrentUserGuild[];
 
 /**
  * https://discord.com/developers/docs/resources/user#leave-guild
  */
-export type RestDeleteAPICurrentUserGuildResult = never;
+export type DeleteAPICurrentUserGuildResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/user#create-dm
  */
-export interface RestPostAPICurrentUserCreateDMChannelJSONBody {
+export interface PostAPICurrentUserCreateDMChannelJSONBody {
 	recipient_id: string;
 }
 
-export type RestPostAPICurrentUserCreateDMChannelResult = APIChannel;
+export type PostAPICurrentUserCreateDMChannelResult = APIChannel;
 
 /**
  * https://discord.com/developers/docs/resources/user#get-user-connections
  */
-export type RestGetAPICurrentUserConnectionsResult = APIConnection[];
+export type GetAPICurrentUserConnectionsResult = APIConnection[];

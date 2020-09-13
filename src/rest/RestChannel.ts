@@ -4,7 +4,7 @@ import {
 	APIChannel,
 	APIUser,
 	APIMessage,
-	RestPostAPIChannelMessageFormDataBody,
+	PostAPIChannelMessageFormDataBody,
 	APIInvite
 } from "../typings/mod.ts";
 
@@ -51,7 +51,7 @@ export class RestChannel
 		return this._rest.get<APIMessage>(`${this.route}/messages/${id}`);
 	}
 
-	public createMessage(opts: RestPostAPIChannelMessageFormDataBody)
+	public createMessage(opts: PostAPIChannelMessageFormDataBody)
 	{
 		// WARNING: Before using this endpoint, you must connect to and identify with a gateway at least once.
 		return this._rest.post<APIMessage>(`${this.route}/messages`, opts);
