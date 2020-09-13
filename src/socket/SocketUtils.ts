@@ -1,13 +1,3 @@
-import { SocketEventsName, SomeObject } from "../typings/mod.ts";
-
-export interface SocketData
-{
-	t: SocketEventsName,
-	s: number,
-	op: number,
-	d: SomeObject
-}
-
 export interface DebugMessage
 {
 	message: string
