@@ -1,5 +1,4 @@
 import { RestClient } from "./RestClient.ts";
-import { GuildRes, PatchClientUserReq, ConnectionRes, ClientUserRes, SomeObject } from "../typings/mod.ts";
 
 export class RestVoice
 {

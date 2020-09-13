@@ -1,5 +1,12 @@
 import { RestClient } from "./RestClient.ts";
-import { GuildRes, PatchClientUserReq, ConnectionRes, ClientUserRes, SomeObject } from "../typings/mod.ts";
+import {
+	APIGuild,
+	RestPatchAPICurrentUserJSONBody,
+	RestPatchAPICurrentUserResult,
+	SomeObject,
+	APIConnection,
+	APIUser
+} from "../typings/mod.ts";
 
 export class RestUser
 {
@@ -33,26 +40,26 @@ export class RestClientUser
 	}
 
 	//#region General
-	public get(): Promise<ClientUserRes>
+	public get()
 	{
-		return this._rest.get<ClientUserRes>(this.route);
+		return this._rest.get<APIUser>(this.route);
 	}
 
 	// TODO This has may have params
-	public modify(opts: PatchClientUserReq): Promise<ClientUserRes>
+	public modify(opts: RestPatchAPICurrentUserJSONBody)
 	{
-		return this._rest.patch<ClientUserRes>(this.route, opts);
+		return this._rest.patch<RestPatchAPICurrentUserResult>(this.route, opts);
 	}
 	//#endregion
 	
 	//#region Guilds
 	// TODO This has may have params
-	public getGuilds(): Promise<GuildRes>
+	public getGuilds()
 	{
-		return this._rest.get<GuildRes>(this.route + "/guilds");
+		return this._rest.get<APIGuild>(this.route + "/guilds");
 	}
 	
-	public leaveGuild(id: string): Promise<void>
+	public leaveGuild(id: string)
 	{
 		return this._rest.delete<void>(`${this.route}/guilds/${id}`);
 	}
@@ -63,26 +70,26 @@ export class RestClientUser
 	 * No longer supported for bots, will return empty array
 	 * [Discord Docs](https://discord.com/developers/docs/resources/user#get-user-dms)
 	 */
-	public getDmChannels(): Promise<unknown[]>
+	public getDmChannels()
 	{
 		return this._rest.get<unknown[]>(this.route + "/channels");
 	}
 
-	public createDm(opts: string): Promise<unknown>
+	public createDm(opts: string)
 	{
 		return this._rest.post<unknown>(this.route + "/channels", { recipient_id: opts });
 	}
 
-	public createGroupDm(opts: SomeObject): Promise<unknown>
+	public createGroupDm(opts: SomeObject)
 	{
 		return this._rest.post<unknown>(this.route + "/channels", opts);
 	}
 	//#endregion
 
 	//#region Misc
-	public getUserConnections(): Promise<ConnectionRes[]>
+	public getUserConnections()
 	{
-		return this._rest.get<ConnectionRes[]>(this.route + "/connections");
+		return this._rest.get<APIConnection[]>(this.route + "/connections");
 	}
 	//#endregion
 }

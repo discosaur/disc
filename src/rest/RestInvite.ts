@@ -1,4 +1,3 @@
-import { GuildRes, PatchClientUserReq, ConnectionRes, ClientUserRes, SomeObject } from "../typings/mod.ts";
 import { RestClient } from "./RestClient.ts";
 
 export class RestInvite
