@@ -6,11 +6,12 @@ import {
 	AGENT
 } from "../../deps.ts";
 
-import { SocketEvent, SocketData, SessionStore, opcodes } from "./mod.ts";
+import { SocketData, SessionStore } from "./mod.ts";
+import { SocketOPCodes, SocketDispatchEventsName } from "../typings/mod.ts";
 import { SomeObject, TypedEmitter } from "../typings/mod.ts";
 import { RestClient } from "../../mod.ts";
 
-export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
+export class SocketClient extends TypedEmitter<SocketDispatchEventsName, SomeObject>
 {
 	private socket?: WebSocket;
 	private session = new SessionStore();
@@ -76,7 +77,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 	private resume()
 	{
 		this.emit("DEBUG", { message: "Trying to resume session after reconnecting" });
-		this.send(opcodes.RESUME, {
+		this.send(SocketOPCodes.RESUME, {
 			token: this.rest.token,
 			session_id: this.session.id,
 			seq: this.session.sequence
@@ -96,7 +97,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 	private identify()
 	{
 		this.emit("DEBUG", { message: "Identifying with WebSocket connection..." });
-		this.send(opcodes.IDENTIFY, {
+		this.send(SocketOPCodes.IDENTIFY, {
 			token: this.rest.token,
 			properties: {
 				$os: platform,
@@ -110,7 +111,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 	{
 		this.emit("DEBUG", { message: "Sending a heartbeat..." })
 		this.session.heartbeatTimestamp = Date.now();
-		this.send(opcodes.HEARTBEAT, this.session.sequence);
+		this.send(SocketOPCodes.HEARTBEAT, this.session.sequence);
 	}
 
 	private updateSequence(s: number | undefined)
@@ -133,7 +134,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 	{
 		switch(data.op)
 		{
-			case opcodes.EVENT:
+			case SocketOPCodes.EVENT:
 				this.emit("DEBUG", { message: `Received an event of type ${data.t}` });
 				if (data.t == "READY")
 					this.session.id = (data.d as { session_id: string }).session_id;
@@ -141,25 +142,25 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 				this.emit(data.t, data.d);
 				break;
 
-			case opcodes.HEARTBEAT:
+			case SocketOPCodes.HEARTBEAT:
 				this.emit("DEBUG", { message: "Received request for an arbitrary heartbeat" });
 				this.heartbeat();
 				break;
 
-			case opcodes.RECONNECT:
+			case SocketOPCodes.RECONNECT:
 				this.emit("DEBUG", { message: "Received request to reconnect..." });
 				this.updateSequence(data.s);
 				this.close();
 				this.setup(true);
 				break;
 
-			case opcodes.INVALIDATED:
+			case SocketOPCodes.INVALIDATED:
 				this.emit("DEBUG", { message: "WebSocket connection invalidated" });
 				this.emit("INVALIDATED", {});
 				this.close();
 				break;
 
-			case opcodes.HELLO:
+			case SocketOPCodes.HELLO:
 				this.emit("DEBUG", { message: "Received HELLO code 10 by WebSocket" });
 				this.session.acknowledged = true;
 				this.session.interval = setInterval(() =>
@@ -177,7 +178,7 @@ export class SocketClient extends TypedEmitter<SocketEvent, SomeObject>
 				}, (data.d as { heartbeat_interval: number }).heartbeat_interval);
 				break;
 
-			case opcodes.HEARTBEAT_ACK:
+			case SocketOPCodes.HEARTBEAT_ACK:
 				this.session.acknowledged = true;
 				this.session.ping = Date.now() - this.session.heartbeatTimestamp!;
 				this.emit("DEBUG", { message: `Heartbeat acknowledged (ping: ${this.ping}ms)` });
