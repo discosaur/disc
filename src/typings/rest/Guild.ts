@@ -28,7 +28,7 @@ export type APIGuildCreatePartialChannel = Partial<
 /**
  * https://discord.com/developers/docs/resources/guild#create-guild
  */
-export interface RESTPostAPIGuildsJSONBody {
+export interface RestPostAPIGuildsJSONBody {
 	name: string;
 	region?: string;
 	icon?: string;
@@ -42,26 +42,26 @@ export interface RESTPostAPIGuildsJSONBody {
 	system_channel_id?: string;
 }
 
-export type RESTPostAPIGuildsResult = APIGuild;
+export type RestPostAPIGuildsResult = APIGuild;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild
  */
-export interface RESTGetAPIGuildQuery {
+export interface RestGetAPIGuildQuery {
 	with_counts?: boolean;
 }
 
-export type RESTGetAPIGuildResult = APIGuild;
+export type RestGetAPIGuildResult = APIGuild;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-preview
  */
-export type RESTGetAPIGuildPreviewResult = APIGuildPreview;
+export type RestGetAPIGuildPreviewResult = APIGuildPreview;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild
  */
-export interface RESTPatchAPIGuildJSONBody {
+export interface RestPatchAPIGuildJSONBody {
 	name?: string;
 	region?: string;
 	verification_level?: GuildVerificationLevel;
@@ -82,63 +82,63 @@ export interface RESTPatchAPIGuildJSONBody {
 	description?: string | null;
 }
 
-export type RESTPatchAPIGuildResult = APIGuild;
+export type RestPatchAPIGuildResult = APIGuild;
 
 /**
  * https://discord.com/developers/docs/resources/guild#delete-guild
  */
-export type RESTDeleteAPIGuildResult = never;
+export type RestDeleteAPIGuildResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-channels
  */
-export type RESTGetAPIGuildChannelsResult = APIChannel[];
+export type RestGetAPIGuildChannelsResult = APIChannel[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#create-guild-channel
  */
-export type RESTPostAPIGuildChannelJSONBody = APIGuildCreatePartialChannel;
+export type RestPostAPIGuildChannelJSONBody = APIGuildCreatePartialChannel;
 
-export type RESTPostAPIGuildChannelResult = APIChannel;
+export type RestPostAPIGuildChannelResult = APIChannel;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
  */
-export type RESTPatchAPIGuildChannelPositionsJSONBody = Array<{
+export type RestPatchAPIGuildChannelPositionsJSONBody = Array<{
 	id: string;
 	position: number;
 	lock_permissions?: boolean;
 	parent_id?: string | null;
 }>;
 
-export type RESTPatchAPIGuildChannelPositionsResult = never;
+export type RestPatchAPIGuildChannelPositionsResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-member
  */
-export type RESTGetAPIGuildMemberResult = APIGuildMember;
+export type RestGetAPIGuildMemberResult = APIGuildMember;
 
 /**
  * https://discord.com/developers/docs/resources/guild#list-guild-members
  */
-export interface RESTGetAPIGuildMembersQuery {
+export interface RestGetAPIGuildMembersQuery {
 	limit?: number;
 	after?: string;
 }
 
-export type RESTGetAPIGuildMembersResult = APIGuildMember[];
+export type RestGetAPIGuildMembersResult = APIGuildMember[];
 
-export interface RESTGetAPIGuildMembersSearchQuery {
+export interface RestGetAPIGuildMembersSearchQuery {
 	query: string;
 	limit?: number;
 }
 
-export type RESTGetAPIGuildMembersSearchResult = APIGuildMember[];
+export type RestGetAPIGuildMembersSearchResult = APIGuildMember[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#add-guild-member
  */
-export interface RESTPutAPIGuildMemberJSONBody {
+export interface RestPutAPIGuildMemberJSONBody {
 	access_token: string;
 	nick?: string;
 	roles?: string[];
@@ -146,12 +146,12 @@ export interface RESTPutAPIGuildMemberJSONBody {
 	deaf?: boolean;
 }
 
-export type RESTPutAPIGuildMemberResult = APIGuildMember | undefined;
+export type RestPutAPIGuildMemberResult = APIGuildMember | undefined;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild-member
  */
-export interface RESTPatchAPIGuildMemberJSONBody {
+export interface RestPatchAPIGuildMemberJSONBody {
 	nick?: string | null;
 	roles?: string[] | null;
 	mute?: boolean | null;
@@ -159,66 +159,66 @@ export interface RESTPatchAPIGuildMemberJSONBody {
 	channel_id?: string | null;
 }
 
-export type RESTPatchAPIGuildMemberResult = never;
+export type RestPatchAPIGuildMemberResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-current-user-nick
  */
-export interface RESTPatchAPICurrentGuildMemberNicknameJSONBody {
+export interface RestPatchAPICurrentGuildMemberNicknameJSONBody {
 	nick?: string | null;
 }
 
-export type RESTPatchAPICurrentGuildMemberNicknameResult = Required<RESTPatchAPICurrentGuildMemberNicknameJSONBody>;
+export type RestPatchAPICurrentGuildMemberNicknameResult = Required<RestPatchAPICurrentGuildMemberNicknameJSONBody>;
 
 /**
  * https://discord.com/developers/docs/resources/guild#add-guild-member-role
  */
-export type RESTPutAPIGuildMemberRoleResult = never;
+export type RestPutAPIGuildMemberRoleResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#remove-guild-member-role
  */
-export type RESTDeleteAPIGuildMemberRoleResult = never;
+export type RestDeleteAPIGuildMemberRoleResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#remove-guild-member
  */
-export type RESTDeleteAPIGuildMemberResult = never;
+export type RestDeleteAPIGuildMemberResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-bans
  */
-export type RESTGetAPIGuildBansResult = APIBan[];
+export type RestGetAPIGuildBansResult = APIBan[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-ban
  */
-export type RESTGetAPIGuildBanResult = APIBan;
+export type RestGetAPIGuildBanResult = APIBan;
 
 /**
  * https://discord.com/developers/docs/resources/guild#create-guild-ban
  */
-export interface RESTPutAPIGuildBanJSONBody {
+export interface RestPutAPIGuildBanJSONBody {
 	delete_message_days?: number;
 	reason?: string;
 }
 
-export type RESTPutAPIGuildBanResult = never;
+export type RestPutAPIGuildBanResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#remove-guild-ban
  */
-export type RESTDeleteAPIGuildBanResult = never;
+export type RestDeleteAPIGuildBanResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-roles
  */
-export type RESTGetAPIGuildRolesResult = APIRole[];
+export type RestGetAPIGuildRolesResult = APIRole[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#create-guild-role
  */
-export interface RESTPostAPIGuildRoleJSONBody {
+export interface RestPostAPIGuildRoleJSONBody {
 	name?: string | null;
 	permissions?: number | string | null;
 	color?: number | null;
@@ -226,22 +226,22 @@ export interface RESTPostAPIGuildRoleJSONBody {
 	mentionable?: boolean | null;
 }
 
-export type RESTPostAPIGuildRoleResult = APIRole;
+export type RestPostAPIGuildRoleResult = APIRole;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
  */
-export type RESTPatchAPIGuildRolePositionsJSONBody = Array<{
+export type RestPatchAPIGuildRolePositionsJSONBody = Array<{
 	id: string;
 	position?: number;
 }>;
 
-export type RESTPatchAPIGuildRolePositionsResult = APIRole[];
+export type RestPatchAPIGuildRolePositionsResult = APIRole[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild-role
  */
-export interface RESTPatchAPIGuildRoleJSONBody {
+export interface RestPatchAPIGuildRoleJSONBody {
 	name?: string;
 	permissions?: number | string;
 	color?: number;
@@ -249,17 +249,17 @@ export interface RESTPatchAPIGuildRoleJSONBody {
 	mentionable?: boolean;
 }
 
-export type RESTPatchAPIGuildRoleResult = APIRole;
+export type RestPatchAPIGuildRoleResult = APIRole;
 
 /**
  * https://discord.com/developers/docs/resources/guild#delete-guild-role
  */
-export type RESTDeleteAPIGuildRoleResult = never;
+export type RestDeleteAPIGuildRoleResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-prune-count
  */
-export interface RESTGetAPIGuildPruneCountQuery {
+export interface RestGetAPIGuildPruneCountQuery {
 	days?: number;
 	/**
 	 * While this is typed as a string, it represents an array of
@@ -270,89 +270,89 @@ export interface RESTGetAPIGuildPruneCountQuery {
 	include_roles?: string;
 }
 
-export interface RESTGetAPIGuildPruneCountResult {
+export interface RestGetAPIGuildPruneCountResult {
 	pruned: number;
 }
 
 /**
  * https://discord.com/developers/docs/resources/guild#begin-guild-prune
  */
-export interface RESTPostAPIGuildPruneJSONBody {
+export interface RestPostAPIGuildPruneJSONBody {
 	days?: number;
 	compute_prune_count?: boolean;
 	include_roles?: string[];
 }
 
-export interface RESTPostAPIGuildPruneResult {
+export interface RestPostAPIGuildPruneResult {
 	pruned: number | null;
 }
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
  */
-export type RESTGetAPIGuildVoiceRegionsResult = APIVoiceRegion[];
+export type RestGetAPIGuildVoiceRegionsResult = APIVoiceRegion[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-invites
  */
-export type RESTGetAPIGuildInvitesResult = APIInvite[];
+export type RestGetAPIGuildInvitesResult = APIInvite[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-integrations
  */
-export interface RESTGetAPIGuildIntegrationsQuery {
+export interface RestGetAPIGuildIntegrationsQuery {
 	include_applications?: boolean;
 }
 
-export type RESTGetAPIGuildIntegrationsResult = APIGuildIntegration[];
+export type RestGetAPIGuildIntegrationsResult = APIGuildIntegration[];
 
 /**
  * https://discord.com/developers/docs/resources/guild#create-guild-integration
  */
-export interface RESTPostAPIGuildIntegrationJSONBody {
+export interface RestPostAPIGuildIntegrationJSONBody {
 	type: string;
 	id: string;
 }
 
-export type RESTPostAPIGuildIntegrationResult = never;
+export type RestPostAPIGuildIntegrationResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild-integration
  */
-export interface RESTPatchAPIGuildIntegrationJSONBody {
+export interface RestPatchAPIGuildIntegrationJSONBody {
 	expire_behavior?: IntegrationExpireBehavior | null;
 	expire_grace_period?: number | null;
 	enable_emoticons?: boolean | null;
 }
 
-export type RESTPatchAPIGuildIntegrationResult = never;
+export type RestPatchAPIGuildIntegrationResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#delete-guild-integration
  */
-export type RESTDeleteAPIGuildIntegrationResult = never;
+export type RestDeleteAPIGuildIntegrationResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#sync-guild-integration
  */
-export type RESTPostAPIGuildIntegrationSyncResult = never;
+export type RestPostAPIGuildIntegrationSyncResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-widget
  */
-export type RESTGetAPIGuildWidgetResult = APIGuildWidget;
+export type RestGetAPIGuildWidgetResult = APIGuildWidget;
 
 /**
  * https://discord.com/developers/docs/resources/guild#modify-guild-widget
  */
-export type RESTPatchAPIGuildWidgetJSONBody = Partial<APIGuildWidget>;
+export type RestPatchAPIGuildWidgetJSONBody = Partial<APIGuildWidget>;
 
-export type RESTPatchAPIGuildWidgetResult = APIGuildWidget;
+export type RestPatchAPIGuildWidgetResult = APIGuildWidget;
 
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-vanity-url
  */
-export interface RESTGetAPIGuildVanityUrlResult {
+export interface RestGetAPIGuildVanityUrlResult {
 	code: string | null;
 	uses: number;
 }
@@ -360,7 +360,7 @@ export interface RESTGetAPIGuildVanityUrlResult {
 /**
  * https://discord.com/developers/docs/resources/guild#get-guild-widget-image
  */
-export interface RESTGetAPIGuildWidgetImageQuery {
+export interface RestGetAPIGuildWidgetImageQuery {
 	style?: GuildWidgetStyle;
 }
 
@@ -368,4 +368,4 @@ export interface RESTGetAPIGuildWidgetImageQuery {
  * Note: while the return type is `ArrayBuffer`, the expected result is
  * a buffer of sorts (depends if in browser or on node.js/deno).
  */
-export type RESTGetAPIGuildWidgetImageResult = ArrayBuffer;
+export type RestGetAPIGuildWidgetImageResult = ArrayBuffer;

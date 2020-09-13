@@ -3,17 +3,17 @@ import type { APIEmoji } from "../mod.ts";
 /**
  * https://discord.com/developers/docs/resources/emoji#list-guild-emojis
  */
-export type RESTGetAPIGuildEmojisResult = APIEmoji[];
+export type RestGetAPIGuildEmojisResult = APIEmoji[];
 
 /**
  * https://discord.com/developers/docs/resources/emoji#get-guild-emoji
  */
-export type RESTGetAPIGuildEmojiResult = APIEmoji;
+export type RestGetAPIGuildEmojiResult = APIEmoji;
 
 /**
  * https://discord.com/developers/docs/resources/emoji#create-guild-emoji-json-params
  */
-export interface RESTPostAPIGuildEmojiJSONBody {
+export interface RestPostAPIGuildEmojiJSONBody {
 	name: string;
 	/**
 	 * The image data, read more [here](https://discord.com/developers/docs/reference#image-data)
@@ -22,19 +22,19 @@ export interface RESTPostAPIGuildEmojiJSONBody {
 	roles?: string[];
 }
 
-export type RESTPostAPIGuildEmojiResult = APIEmoji;
+export type RestPostAPIGuildEmojiResult = APIEmoji;
 
 /**
  * https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
  */
-export interface RESTPatchAPIGuildEmojiJSONBody {
+export interface RestPatchAPIGuildEmojiJSONBody {
 	name?: string;
 	roles?: string[] | null;
 }
 
-export type RESTPatchAPIGuildEmojiResult = APIEmoji;
+export type RestPatchAPIGuildEmojiResult = APIEmoji;
 
 /**
  * https://discord.com/developers/docs/resources/emoji#delete-guild-emoji
  */
-export type RESTDeleteAPIGuildEmojiResult = never;
+export type RestDeleteAPIGuildEmojiResult = never;

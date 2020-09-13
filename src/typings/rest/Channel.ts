@@ -47,7 +47,7 @@ export interface APIAllowedMentionsSend {
 /**
  * https://discord.com/developers/docs/resources/channel#modify-channel
  */
-export interface RESTPatchAPIChannelJSONBody {
+export interface RestPatchAPIChannelJSONBody {
 	name?: string;
 	type?: ChannelType.GUILD_NEWS | ChannelType.GUILD_TEXT;
 	position?: number | null;
@@ -59,26 +59,26 @@ export interface RESTPatchAPIChannelJSONBody {
 	parent_id?: string | null;
 }
 
-export type RESTGetAPIChannelResult = APIChannel;
-export type RESTPatchAPIChannelResult = APIChannel;
-export type RESTDeleteAPIChannelResult = APIChannel;
+export type RestGetAPIChannelResult = APIChannel;
+export type RestPatchAPIChannelResult = APIChannel;
+export type RestDeleteAPIChannelResult = APIChannel;
 
 /**
  * https://discord.com/developers/docs/resources/channel#get-channel-messages
  */
-export interface RESTGetAPIChannelMessagesQuery {
+export interface RestGetAPIChannelMessagesQuery {
 	around?: string;
 	before?: string;
 	after?: string;
 	limit?: number;
 }
 
-export type RESTGetAPIChannelMessagesResult = APIMessage[];
+export type RestGetAPIChannelMessagesResult = APIMessage[];
 
 /**
  * https://discord.com/developers/docs/resources/channel#create-message
  */
-export interface RESTPostAPIChannelMessageJSONBody {
+export interface RestPostAPIChannelMessageJSONBody {
 	content?: string;
 	nonce?: number | string;
 	tts?: boolean;
@@ -89,7 +89,7 @@ export interface RESTPostAPIChannelMessageJSONBody {
 /**
  * https://discord.com/developers/docs/resources/channel#create-message
  */
-export type RESTPostAPIChannelMessageFormDataBody =
+export type RestPostAPIChannelMessageFormDataBody =
 	| {
 			/**
 			 * JSON stringified message body
@@ -115,60 +115,60 @@ export type RESTPostAPIChannelMessageFormDataBody =
 /**
  * https://discord.com/developers/docs/resources/channel#edit-message
  */
-export interface RESTPatchAPIChannelMessageJSONBody {
+export interface RestPatchAPIChannelMessageJSONBody {
 	content?: string | null;
 	embed?: APIEmbed | null;
 	allowed_mentions?: APIAllowedMentionsSend | null;
 	flags?: MessageFlags | null;
 }
 
-export type RESTGetAPIChannelMessageResult = APIMessage;
-export type RESTPostAPIChannelMessageResult = APIMessage;
-export type RESTPatchAPIChannelMessageResult = APIMessage;
-export type RESTDeleteAPIChannelMessageResult = never;
+export type RestGetAPIChannelMessageResult = APIMessage;
+export type RestPostAPIChannelMessageResult = APIMessage;
+export type RestPatchAPIChannelMessageResult = APIMessage;
+export type RestDeleteAPIChannelMessageResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/channel#get-reactions
  */
-export interface RESTGetAPIChannelMessageReactionsQuery {
+export interface RestGetAPIChannelMessageReactionsQuery {
 	before?: string;
 	after?: string;
 	limit?: number;
 }
 
-export type RESTGetAPIChannelMessageReactionsResult = APIUser[];
+export type RestGetAPIChannelMessageReactionsResult = APIUser[];
 
-export type RESTPutAPIChannelMessageReactionResult = never;
-export type RESTDeleteAPIChannelMessageReactionResult = never;
-export type RESTDeleteAPIChannelAllMessageReactionsResult = never;
+export type RestPutAPIChannelMessageReactionResult = never;
+export type RestDeleteAPIChannelMessageReactionResult = never;
+export type RestDeleteAPIChannelAllMessageReactionsResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/channel#bulk-delete-messages
  */
-export interface RESTPostAPIChannelMessagesBulkDeleteJSONBody {
+export interface RestPostAPIChannelMessagesBulkDeleteJSONBody {
 	messages: string[];
 }
 
-export type RESTPostAPIChannelMessagesBulkDeleteResult = never;
+export type RestPostAPIChannelMessagesBulkDeleteResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/channel#edit-channel-permissions
  */
-export interface RESTPutAPIChannelPermissionsJSONBody {
+export interface RestPutAPIChannelPermissionsJSONBody {
 	allow: number | string;
 	deny: number | string;
 	type: OverwriteType;
 }
 
-export type RESTPutAPIChannelPermissionsResult = never;
-export type RESTDeleteAPIChannelPermissionsResult = never;
+export type RestPutAPIChannelPermissionsResult = never;
+export type RestDeleteAPIChannelPermissionsResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/channel#get-channel-invites
  */
-export type RESTGetAPIChannelInvitesResult = APIInvite[];
+export type RestGetAPIChannelInvitesResult = APIInvite[];
 
-export interface RESTPostAPIChannelInviteJSONBody {
+export interface RestPostAPIChannelInviteJSONBody {
 	max_age?: number;
 	max_uses?: number;
 	temporary?: boolean;
@@ -180,36 +180,36 @@ export interface RESTPostAPIChannelInviteJSONBody {
 /**
  * https://discord.com/developers/docs/resources/channel#trigger-typing-indicator
  */
-export type RESTPostAPIChannelTypingResult = never;
+export type RestPostAPIChannelTypingResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/channel#get-pinned-messages
  */
-export type RESTGetAPIChannelPinsResult = APIMessage[];
+export type RestGetAPIChannelPinsResult = APIMessage[];
 
 /**
  * https://discord.com/developers/docs/resources/channel#add-pinned-channel-message
  */
-export type RESTPutAPIChannelPinResult = never;
-export type RESTDeleteAPIChannelPinResult = never;
+export type RestPutAPIChannelPinResult = never;
+export type RestDeleteAPIChannelPinResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/channel#group-dm-add-recipient
  */
-export interface RESTPutAPIChannelRecipientJSONBody {
+export interface RestPutAPIChannelRecipientJSONBody {
 	access_token: string;
 	nick?: string;
 }
 
-export type RESTPutAPIChannelRecipientResult = unknown;
-export type RESTDeleteAPIChannelRecipientResult = unknown;
+export type RestPutAPIChannelRecipientResult = unknown;
+export type RestDeleteAPIChannelRecipientResult = unknown;
 
 // TODO: Docs updated once https://github.com/discord/discord-api-docs/pull/1692/files is merged
 
-export type RESTPostAPIChannelMessageCrosspostResult = APIMessage;
+export type RestPostAPIChannelMessageCrosspostResult = APIMessage;
 
-export interface RESTPostAPIChannelFollowersJSONBody {
+export interface RestPostAPIChannelFollowersJSONBody {
 	webhook_channel_id: string;
 }
 
-export type RESTPostAPIChannelFollowersResult = APIFollowedChannel;
+export type RestPostAPIChannelFollowersResult = APIFollowedChannel;

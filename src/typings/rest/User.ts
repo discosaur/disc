@@ -3,33 +3,33 @@ import type { APIChannel, APIConnection, APIUser, GuildFeature } from "../mod.ts
 /**
  * https://discord.com/developers/docs/resources/user#get-current-user
  */
-export type RESTGetAPICurrentUserResult = APIUser;
+export type RestGetAPICurrentUserResult = APIUser;
 
 /**
  * https://discord.com/developers/docs/resources/user#get-user
  */
-export type RESTGetAPIUserResult = APIUser;
+export type RestGetAPIUserResult = APIUser;
 
 /**
  * https://discord.com/developers/docs/resources/user#modify-current-user
  */
-export interface RESTPatchAPICurrentUserJSONBody {
+export interface RestPatchAPICurrentUserJSONBody {
 	username?: string;
 	avatar?: string | null;
 }
 
-export type RESTPatchAPICurrentUserResult = APIUser;
+export type RestPatchAPICurrentUserResult = APIUser;
 
 /**
  * https://discord.com/developers/docs/resources/user#get-current-user-guilds
  */
-export interface RESTGetAPICurrentUserGuildsQuery {
+export interface RestGetAPICurrentUserGuildsQuery {
 	before?: string;
 	after?: string;
 	limit?: number;
 }
 
-export interface RESTAPIPartialCurrentUserGuild {
+export interface RestAPIPartialCurrentUserGuild {
 	id: string;
 	name: string;
 	icon: string | null;
@@ -42,23 +42,23 @@ export interface RESTAPIPartialCurrentUserGuild {
 	permissions_new: string;
 }
 
-export type RESTGetAPICurrentUserGuildsResult = RESTAPIPartialCurrentUserGuild[];
+export type RestGetAPICurrentUserGuildsResult = RestAPIPartialCurrentUserGuild[];
 
 /**
  * https://discord.com/developers/docs/resources/user#leave-guild
  */
-export type RESTDeleteAPICurrentUserGuildResult = never;
+export type RestDeleteAPICurrentUserGuildResult = never;
 
 /**
  * https://discord.com/developers/docs/resources/user#create-dm
  */
-export interface RESTPostAPICurrentUserCreateDMChannelJSONBody {
+export interface RestPostAPICurrentUserCreateDMChannelJSONBody {
 	recipient_id: string;
 }
 
-export type RESTPostAPICurrentUserCreateDMChannelResult = APIChannel;
+export type RestPostAPICurrentUserCreateDMChannelResult = APIChannel;
 
 /**
  * https://discord.com/developers/docs/resources/user#get-user-connections
  */
-export type RESTGetAPICurrentUserConnectionsResult = APIConnection[];
+export type RestGetAPICurrentUserConnectionsResult = APIConnection[];

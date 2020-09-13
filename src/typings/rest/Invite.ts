@@ -3,13 +3,13 @@ import type { APIInvite } from "../mod.ts";
 /**
  * https://discord.com/developers/docs/resources/invite#get-invite
  */
-export interface RESTGetAPIInviteQuery {
+export interface RestGetAPIInviteQuery {
 	with_counts?: boolean;
 }
 
-export type RESTGetAPIInviteResult = APIInvite;
+export type RestGetAPIInviteResult = APIInvite;
 
 /**
  * https://discord.com/developers/docs/resources/invite#delete-invite
  */
-export type RESTDeleteAPIInviteResult = APIInvite;
+export type RestDeleteAPIInviteResult = APIInvite;

@@ -6,12 +6,11 @@ import {
 	AGENT
 } from "../../deps.ts";
 
-import { SocketData, SessionStore } from "./mod.ts";
-import { SocketOPCodes, SocketDispatchEventsName } from "../typings/mod.ts";
-import { SomeObject, TypedEmitter } from "../typings/mod.ts";
+import { DebugMessage, SessionStore } from "./mod.ts";
+import { SocketOPCodes, SocketDispatchEventsName, SocketDispatchPayload, TypedEmitter, SocketReceivePayload } from "../typings/mod.ts";
 import { RestClient } from "../../mod.ts";
 
-export class SocketClient extends TypedEmitter<SocketDispatchEventsName, SomeObject>
+export class SocketClient extends TypedEmitter<SocketDispatchEventsName, SocketDispatchPayload | DebugMessage>
 {
 	private socket?: WebSocket;
 	private session = new SessionStore();
@@ -46,7 +45,7 @@ export class SocketClient extends TypedEmitter<SocketDispatchEventsName, SomeObj
 				{
 					if (typeof msg === "string")
 					{
-						const json = JSON.parse(msg) as SocketData;
+						const json = JSON.parse(msg) as SocketReceivePayload;
 
 						if (typeof json.s === "number")
 							this.session.sequence = json.s;
@@ -130,7 +129,7 @@ export class SocketClient extends TypedEmitter<SocketDispatchEventsName, SomeObj
 		}
 	}
 
-	private async switchOpCode(data: SocketData)
+	private async switchOpCode(data: SocketReceivePayload)
 	{
 		switch(data.op)
 		{
@@ -155,8 +154,7 @@ export class SocketClient extends TypedEmitter<SocketDispatchEventsName, SomeObj
 				break;
 
 			case SocketOPCodes.INVALIDATED:
-				this.emit("DEBUG", { message: "WebSocket connection invalidated" });
-				this.emit("INVALIDATED", {});
+				this.emit("INVALIDATED", { message: "WebSocket connection invalidated"});
 				this.close();
 				break;
 

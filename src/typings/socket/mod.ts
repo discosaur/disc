@@ -16,7 +16,7 @@ import type {
 	SocketVoiceState,
 	InviteTargetUserType,
 	PresenceUpdateStatus,
-} from "../payloads/mod.ts";
+} from "../mod.ts";
 
 /**
  * https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
@@ -163,41 +163,42 @@ export enum SocketDispatchEvents {
 
 export type SocketDispatchEventsName =
 	// raw discord events
-	| "READY"
-	| "CHANNEL_CREATE"
-	| "CHANNEL_DELETE"
-	| "CHANNEL_UPDATE"
-	| "CHANNEL_PINS_UPGRADE"
-	| "GUILD_CREATE"
-	| "GUILD_DELETE"
-	| "GUILD_BAN_ADD"
-	| "GUILD_BAN_REMOVE"
-	| "GUILD_EMOJIS_UPDATE"
-	| "GUILD_INTEGRATIONS_UPDATE"
-	| "GUILD_MEMBER_ADD"
-	| "GUILD_MEMBER_REMOVE"
-	| "GUILD_MEMBER_UPDATE"
-	| "GUILD_MEMBERS_CHUNK"
-	| "GUILD_ROLE_CREATE"
-	| "GUILD_ROLE_DELETE"
-	| "GUILD_ROLE_UPDATE"
-	| "GUILD_UPDATE"
-	| "INVITE_CREATE"
-	| "INVITE_DELETE"
-	| "MESSAGE_CREATE"
-	| "MESSAGE_DELETE"
-	| "MESSAGE_UPDATE"
-	| "MESSAGE_DELETE_BULK"
-	| "MESSAGE_REACTION_ADD"
-	| "MESSAGE_REACTION_REMOVE"
-	| "MESSAGE_REACTION_REMOVE_ALL"
-	| "MESSAGE_REACTION_REMOVE_EMOJI"
-	| "PRESENCE_UPDATE"
-	| "TYPING_START"
-	| "USER_UPDATE"
-	| "VOICE_STATE_UPDATE"
-	| "VOICE_SERVER_UPDATE"
-	| "WEBHOOKS_UPDATE"
+	| SocketDispatchEvents.Ready
+	| SocketDispatchEvents.Resumed
+	| SocketDispatchEvents.ChannelCreate
+	| SocketDispatchEvents.ChannelUpdate
+	| SocketDispatchEvents.ChannelDelete
+	| SocketDispatchEvents.ChannelPinsUpdate
+	| SocketDispatchEvents.GuildCreate
+	| SocketDispatchEvents.GuildUpdate
+	| SocketDispatchEvents.GuildDelete
+	| SocketDispatchEvents.GuildBanAdd
+	| SocketDispatchEvents.GuildBanRemove
+	| SocketDispatchEvents.GuildEmojisUpdate
+	| SocketDispatchEvents.GuildIntegrationsUpdate
+	| SocketDispatchEvents.GuildMemberAdd
+	| SocketDispatchEvents.GuildMemberRemove
+	| SocketDispatchEvents.GuildMemberUpdate
+	| SocketDispatchEvents.GuildMembersChunk
+	| SocketDispatchEvents.GuildRoleCreate
+	| SocketDispatchEvents.GuildRoleUpdate
+	| SocketDispatchEvents.GuildRoleDelete
+	| SocketDispatchEvents.InviteCreate
+	| SocketDispatchEvents.InviteDelete
+	| SocketDispatchEvents.MessageCreate
+	| SocketDispatchEvents.MessageUpdate
+	| SocketDispatchEvents.MessageDelete
+	| SocketDispatchEvents.MessageDeleteBulk
+	| SocketDispatchEvents.MessageReactionAdd
+	| SocketDispatchEvents.MessageReactionRemove
+	| SocketDispatchEvents.MessageReactionRemoveAll
+	| SocketDispatchEvents.MessageReactionRemoveEmoji
+	| SocketDispatchEvents.PresenceUpdate
+	| SocketDispatchEvents.TypingStart
+	| SocketDispatchEvents.UserUpdate
+	| SocketDispatchEvents.VoiceStateUpdate
+	| SocketDispatchEvents.VoiceServerUpdate
+	| SocketDispatchEvents.WebhooksUpdate
 	// self-defined events for utility
 	| "INVALIDATED"
 	| "DEBUG";
@@ -216,7 +217,7 @@ export type SocketReceivePayload =
 	| SocketHeartbeatAck
 	| SocketInvalidSession
 	| SocketReconnect
-	| SocketDispatchPayload;
+	| DataPayload;
 
 export type SocketDispatchPayload =
 	| SocketReadyDispatch
@@ -249,7 +250,7 @@ export type SocketDispatchPayload =
 	| SocketUserUpdateDispatch
 	| SocketVoiceStateUpdateDispatch
 	| SocketVoiceServerUpdateDispatch
-	| SocketWebhooksUpdateDispatch;
+	| SocketWebhooksUpdateDispatch
 
 // #region Dispatch Payloads
 /**
@@ -297,22 +298,20 @@ export interface SocketReconnect extends NonDispatchPayload {
 /**
  * https://discord.com/developers/docs/topics/gateway#ready
  */
-export type SocketReadyDispatch = DataPayload<
-	SocketDispatchEvents.Ready,
-	{
-		v: number;
-		user: APIUser;
-		session_id: string;
-		private_channels: [];
-		guilds: APIUnavailableGuild[];
-		shard?: [number, number];
-	}
->;
+export interface SocketReadyDispatch
+{
+	v: number;
+	user: APIUser;
+	session_id: string;
+	private_channels: [];
+	guilds: APIUnavailableGuild[];
+	shard?: [number, number];
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#resumed
  */
-export type SocketResumedDispatch = DataPayload<SocketDispatchEvents.Resumed, never>;
+export type SocketResumedDispatch = never;
 
 /* eslint-disable @typescript-eslint/indent */
 /**
@@ -320,10 +319,9 @@ export type SocketResumedDispatch = DataPayload<SocketDispatchEvents.Resumed, ne
  * https://discord.com/developers/docs/topics/gateway#channel-update
  * https://discord.com/developers/docs/topics/gateway#channel-delete
  */
-export type SocketChannelModifyDispatch = DataPayload<
-	SocketDispatchEvents.ChannelCreate | SocketDispatchEvents.ChannelDelete | SocketDispatchEvents.ChannelUpdate,
-	APIChannel
->;
+export type SocketChannelModifyDispatch = APIChannel;
+	
+
 /* eslint-enable @typescript-eslint/indent */
 
 export type SocketChannelCreateDispatch = SocketChannelModifyDispatch;
@@ -333,23 +331,18 @@ export type SocketChannelDeleteDispatch = SocketChannelModifyDispatch;
 /**
  * https://discord.com/developers/docs/topics/gateway#channel-pins-update
  */
-export type SocketChannelPinsUpdateDispatch = DataPayload<
-	SocketDispatchEvents.ChannelPinsUpdate,
-	{
-		guild_id?: string;
-		channel_id: string;
-		last_pin_timestamp?: string;
-	}
->;
+export interface SocketChannelPinsUpdateDispatch
+{
+	guild_id?: string;
+	channel_id: string;
+	last_pin_timestamp?: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-create
  * https://discord.com/developers/docs/topics/gateway#guild-update
  */
-export type SocketGuildModifyDispatch = DataPayload<
-	SocketDispatchEvents.GuildCreate | SocketDispatchEvents.GuildUpdate,
-	APIGuild
->;
+export type SocketGuildModifyDispatch = APIGuild;
 
 export type SocketGuildCreateDispatch = SocketGuildModifyDispatch;
 export type SocketGuildUpdateDispatch = SocketGuildModifyDispatch;
@@ -357,19 +350,17 @@ export type SocketGuildUpdateDispatch = SocketGuildModifyDispatch;
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-delete
  */
-export type SocketGuildDeleteDispatch = DataPayload<SocketDispatchEvents.GuildDelete, APIUnavailableGuild>;
+export type SocketGuildDeleteDispatch = APIUnavailableGuild;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-ban-add
  * https://discord.com/developers/docs/topics/gateway#guild-ban-remove
  */
-export type SocketGuildBanModifyDispatch = DataPayload<
-	SocketDispatchEvents.GuildBanAdd | SocketDispatchEvents.GuildBanRemove,
-	{
-		guild_id: string;
-		user: APIUser;
-	}
->;
+export interface SocketGuildBanModifyDispatch
+{
+	guild_id: string;
+	user: APIUser;
+}
 
 export type SocketGuildBanAddDispatch = SocketGuildBanModifyDispatch;
 export type SocketGuildBanRemoveDispatch = SocketGuildBanModifyDispatch;
@@ -377,78 +368,65 @@ export type SocketGuildBanRemoveDispatch = SocketGuildBanModifyDispatch;
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-emojis-update
  */
-export type SocketGuildEmojisUpdateDispatch = DataPayload<
-	SocketDispatchEvents.GuildEmojisUpdate,
-	{
-		guild_id: string;
-		emojis: APIEmoji[];
-	}
->;
+export interface SocketGuildEmojisUpdateDispatch
+{
+	guild_id: string;
+	emojis: APIEmoji[];
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-integrations-update
  */
-export type SocketGuildIntegrationsUpdateDispatch = DataPayload<
-	SocketDispatchEvents.GuildIntegrationsUpdate,
-	{ guild_id: string }
->;
+export interface SocketGuildIntegrationsUpdateDispatch
+{
+	guild_id: string
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-member-add
  */
-export type SocketGuildMemberAddDispatch = DataPayload<
-	SocketDispatchEvents.GuildMemberAdd,
-	APIGuildMember & { guild_id: string }
->;
+export type SocketGuildMemberAddDispatch = APIGuildMember & { guild_id: string };
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-member-remove
  */
-export type SocketGuildMemberRemoveDispatch = DataPayload<
-	SocketDispatchEvents.GuildMemberRemove,
-	{
-		guild_id: string;
-		user: APIUser;
-	}
->;
+export interface SocketGuildMemberRemoveDispatch
+{
+	guild_id: string;
+	user: APIUser;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-member-update
  */
-export type SocketGuildMemberUpdateDispatch = DataPayload<
-	SocketDispatchEvents.GuildMemberUpdate,
+export type SocketGuildMemberUpdateDispatch =
 	Omit<APIGuildMember, "deaf" | "mute"> & {
 		guild_id: string;
-	}
->;
+	};
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-members-chunk
  */
-export type SocketGuildMembersChunkDispatch = DataPayload<
-	SocketDispatchEvents.GuildMembersChunk,
-	{
-		guild_id: string;
-		members: APIGuildMember[];
-		chunk_index?: number;
-		chunk_count?: number;
-		not_found?: unknown[];
-		presences?: RawSocketPresenceUpdate[];
-		nonce?: string;
-	}
->;
+export interface SocketGuildMembersChunkDispatch
+{
+	guild_id: string;
+	members: APIGuildMember[];
+	chunk_index?: number;
+	chunk_count?: number;
+	not_found?: unknown[];
+	presences?: RawSocketPresenceUpdate[];
+	nonce?: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-role-create
  * https://discord.com/developers/docs/topics/gateway#guild-role-update
  */
-export type SocketGuildRoleModifyDispatch = DataPayload<
-	SocketDispatchEvents.GuildRoleCreate | SocketDispatchEvents.GuildRoleUpdate,
-	{
-		guild_id: string;
-		role: APIRole;
-	}
->;
+export interface SocketGuildRoleModifyDispatch
+{
+	guild_id: string;
+	role: APIRole;
+}
 
 export type SocketGuildRoleCreateDispatch = SocketGuildRoleModifyDispatch;
 export type SocketGuildRoleUpdateDispatch = SocketGuildRoleModifyDispatch;
@@ -456,82 +434,71 @@ export type SocketGuildRoleUpdateDispatch = SocketGuildRoleModifyDispatch;
 /**
  * https://discord.com/developers/docs/topics/gateway#guild-role-delete
  */
-export type SocketGuildRoleDeleteDispatch = DataPayload<
-	SocketDispatchEvents.GuildRoleDelete,
-	{
-		guild_id: string;
-		role_id: string;
-	}
->;
+export interface SocketGuildRoleDeleteDispatch
+{
+	guild_id: string;
+	role_id: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#invite-create
  */
-export type SocketInviteCreateDispatch = DataPayload<
-	SocketDispatchEvents.InviteCreate,
-	{
-		channel_id: string;
-		code: string;
-		created_at: number;
-		guild_id?: string;
-		inviter?: APIUser;
-		max_age: number;
-		max_uses: number;
-		target_user?: APIUser;
-		target_user_type?: InviteTargetUserType;
-		temporary: boolean;
-		uses: 0;
-	}
->;
+export interface SocketInviteCreateDispatch
+{
+	channel_id: string;
+	code: string;
+	created_at: number;
+	guild_id?: string;
+	inviter?: APIUser;
+	max_age: number;
+	max_uses: number;
+	target_user?: APIUser;
+	target_user_type?: InviteTargetUserType;
+	temporary: boolean;
+	uses: 0;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#invite-delete
  */
-export type SocketInviteDeleteDispatch = DataPayload<
-	SocketDispatchEvents.InviteDelete,
-	{
-		channel_id: string;
-		guild_id?: string;
-		code: string;
-	}
->;
+export interface SocketInviteDeleteDispatch
+{
+	channel_id: string;
+	guild_id?: string;
+	code: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-create
  */
-export type SocketMessageCreateDispatch = DataPayload<SocketDispatchEvents.MessageCreate, APIMessage>;
+export type SocketMessageCreateDispatch = APIMessage;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-update
  */
-export type SocketMessageUpdateDispatch = DataPayload<
-	SocketDispatchEvents.MessageUpdate,
-	{ id: string; channel_id: string } & Partial<APIMessage>
->;
+export type SocketMessageUpdateDispatch = 
+	{ id: string; channel_id: string }
+	& Partial<APIMessage>;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-delete
  */
-export type SocketMessageDeleteDispatch = DataPayload<
-	SocketDispatchEvents.MessageDelete,
-	{
-		id: string;
-		channel_id: string;
-		guild_id?: string;
-	}
->;
+export interface SocketMessageDeleteDispatch
+{
+	id: string;
+	channel_id: string;
+	guild_id?: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-delete-bulk
  */
-export type SocketMessageDeleteBulkDispatch = DataPayload<
-	SocketDispatchEvents.MessageDeleteBulk,
-	{
-		ids: string[];
-		channel_id: string;
-		guild_id?: string;
-	}
->;
+export interface SocketMessageDeleteBulkDispatch
+{
+	ids: string[];
+	channel_id: string;
+	guild_id?: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-reaction-add
@@ -546,72 +513,61 @@ export type SocketMessageReactionRemoveDispatch = ReactionData<SocketDispatchEve
 /**
  * https://discord.com/developers/docs/topics/gateway#message-reaction-remove-all
  */
-export type SocketMessageReactionRemoveAllDispatch = DataPayload<
-	SocketDispatchEvents.MessageReactionRemoveAll,
-	MessageReactionRemoveData
->;
+export type SocketMessageReactionRemoveAllDispatch = MessageReactionRemoveData;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#message-reaction-remove-emoji
  */
-export type SocketMessageReactionRemoveEmojiDispatch = DataPayload<
-	SocketDispatchEvents.MessageReactionRemoveEmoji,
+export type SocketMessageReactionRemoveEmojiDispatch = 
 	MessageReactionRemoveData & {
 		emoji: APIEmoji;
-	}
->;
+	};
 
 /**
  * https://discord.com/developers/docs/topics/gateway#presence-update
  */
-export type SocketPresenceUpdateDispatch = DataPayload<SocketDispatchEvents.PresenceUpdate, RawSocketPresenceUpdate>;
+export type SocketPresenceUpdateDispatch = RawSocketPresenceUpdate;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#typing-start
  */
-export type SocketTypingStartDispatch = DataPayload<
-	SocketDispatchEvents.TypingStart,
-	{
-		channel_id: string;
-		guild_id?: string;
-		user_id: string;
-		timestamp: number;
-		member?: APIGuildMember;
-	}
->;
+export interface SocketTypingStartDispatch
+{
+	channel_id: string;
+	guild_id?: string;
+	user_id: string;
+	timestamp: number;
+	member?: APIGuildMember;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#user-update
  */
-export type SocketUserUpdateDispatch = DataPayload<SocketDispatchEvents.UserUpdate, APIUser>;
+export type SocketUserUpdateDispatch = APIUser;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#voice-state-update
  */
-export type SocketVoiceStateUpdateDispatch = DataPayload<SocketDispatchEvents.VoiceStateUpdate, SocketVoiceState>;
+export type SocketVoiceStateUpdateDispatch = SocketVoiceState;
 
 /**
  * https://discord.com/developers/docs/topics/gateway#voice-server-update
  */
-export type SocketVoiceServerUpdateDispatch = DataPayload<
-	SocketDispatchEvents.VoiceServerUpdate,
-	{
-		token: string;
-		guild_id: string;
-		endpoint: string;
-	}
->;
+export interface SocketVoiceServerUpdateDispatch
+{
+	token: string;
+	guild_id: string;
+	endpoint: string;
+}
 
 /**
  * https://discord.com/developers/docs/topics/gateway#webhooks-update
  */
-export type SocketWebhooksUpdateDispatch = DataPayload<
-	SocketDispatchEvents.WebhooksUpdate,
-	{
-		guild_id: string;
-		channel_id: string;
-	}
->;
+export interface SocketWebhooksUpdateDispatch
+{
+	guild_id: string;
+	channel_id: string;
+}
 
 // #endregion Dispatch Payloads
 
@@ -723,15 +679,14 @@ interface BasePayload
 
 type NonDispatchPayload = Omit<BasePayload, "t">;
 
-interface DataPayload<Event extends SocketDispatchEvents, D = unknown> extends BasePayload
+interface DataPayload extends BasePayload
 {
 	op: SocketOPCodes.EVENT;
-	t: Event;
-	d: D;
+	t: SocketDispatchEvents;
+	d: SocketDispatchPayload;
 }
 
-type ReactionData<E extends SocketDispatchEvents, O extends string = never> = DataPayload<
-	E,
+type ReactionData<E extends SocketDispatchEvents, O extends string = never> =
 	Omit<
 		{
 			user_id: string;
@@ -742,8 +697,7 @@ type ReactionData<E extends SocketDispatchEvents, O extends string = never> = Da
 			emoji: APIEmoji;
 		},
 		O
-	>
->;
+	>;
 
 interface MessageReactionRemoveData {
 	channel_id: string;
