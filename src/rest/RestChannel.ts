@@ -1,5 +1,12 @@
 import { RestClient } from "./RestClient.ts"
-import { SomeObject, SomeChannel, UserRes, MessageRes, MessageReq, Invite } from "../typings/mod.ts";
+import {
+	SomeObject,
+	APIChannel,
+	APIUser,
+	APIMessage,
+	PostAPIChannelMessageFormDataBody,
+	APIInvite
+} from "../typings/mod.ts";
 
 export class RestChannel
 {
@@ -16,142 +23,141 @@ export class RestChannel
 	}
 
 	//#region General
-	public get(): Promise<SomeChannel>
+	public get()
 	{
-		return this._rest.get<SomeChannel>(this.route);
+		return this._rest.get<APIChannel>(this.route);
 	}
 
-	public modify(): Promise<SomeChannel>
+	public modify()
 	{
-		return this._rest.get<SomeChannel>(this.route);
+		return this._rest.get<APIChannel>(this.route);
 	}
 
-	public delete(): Promise<SomeChannel>
+	public delete()
 	{
-		// yes, it returns channel
-		return this._rest.delete<SomeChannel>(this.route);
+		return this._rest.delete<APIChannel>(this.route);
 	}
 	//#endregion
 
 	//#region Messages
-	public getMessages(): Promise<MessageRes[]>
+	public getMessages()
 	{
 		// TODO: query params
-		return this._rest.get<MessageRes[]>(`${this.route}/messages`);
+		return this._rest.get<APIMessage[]>(`${this.route}/messages`);
 	}
 
-	public getMessage(id: string): Promise<MessageRes>
+	public getMessage(id: string)
 	{
-		return this._rest.get<MessageRes>(`${this.route}/messages/${id}`);
+		return this._rest.get<APIMessage>(`${this.route}/messages/${id}`);
 	}
 
-	public createMessage(opts: Partial<MessageReq>): Promise<MessageRes>
+	public createMessage(opts: PostAPIChannelMessageFormDataBody)
 	{
 		// WARNING: Before using this endpoint, you must connect to and identify with a gateway at least once.
-		return this._rest.post<MessageRes>(`${this.route}/messages`, opts);
+		return this._rest.post<APIMessage>(`${this.route}/messages`, opts);
 	}
 	
-	public editMessage(msgId: string, opts: SomeObject): Promise<MessageRes>
+	public editMessage(msgId: string, opts: SomeObject)
 	{
-		return this._rest.patch<MessageRes>(`${this.route}/messages/${msgId}`, opts);
+		return this._rest.patch<APIMessage>(`${this.route}/messages/${msgId}`, opts);
 	}
 
-	public deleteMessage(msgId: string): Promise<void>
+	public deleteMessage(msgId: string)
 	{
 		return this._rest.delete<void>(`${this.route}/messages/${msgId}`);
 	}
 
-	public crosspostMessage(msgId: string): Promise<MessageRes>
+	public crosspostMessage(msgId: string)
 	{
-		return this._rest.delete<MessageRes>(`${this.route}/messages/${msgId}/crosspost`);
+		return this._rest.delete<APIMessage>(`${this.route}/messages/${msgId}/crosspost`);
 	}
 
-	public bulkDeleteMessages(msgs: string[]): Promise<void>
+	public bulkDeleteMessages(msgs: string[])
 	{
 		return this._rest.post<void>(`${this.route}/messages/bulk-delete`, { messages: msgs});
 	}
 	//#endregion
 
 	//#region Message Pins
-	public getPinnedMessages(): Promise<MessageRes[]>
+	public getPinnedMessages()
 	{
-		return this._rest.get<MessageRes[]>(`${this.route}/pins`);
+		return this._rest.get<APIMessage[]>(`${this.route}/pins`);
 	}
 
-	public addPinnedMessage(id: string): Promise<void>
+	public addPinnedMessage(id: string)
 	{
 		return this._rest.put<void>(`${this.route}/pins/${id}`);
 	}
 	
-	public deletePinnedMessage(id: string): Promise<void>
+	public deletePinnedMessage(id: string)
 	{
 		return this._rest.delete<void>(`${this.route}/pins/${id}`);
 	}
 	//#endregion
 
 	//#region Reactions
-	public createReaction(msgId: string, emoji: unknown): Promise<void>
+	public createReaction(msgId: string, emoji: unknown)
 	{
 		return this._rest.put<void>(`${this.route}/messages/${msgId}/reactions/${emoji}/@me`);
 	}
 
-	public deleteOwnReaction(msgId: string, emoji: unknown): Promise<void>
+	public deleteOwnReaction(msgId: string, emoji: unknown)
 	{
 		return this._rest.delete<void>(`${this.route}/messages/${msgId}/reactions/${emoji}/@me`);
 	}
 
-	public deleteUserReaction(msgId: string, emoji: unknown, userId: string): Promise<void>
+	public deleteUserReaction(msgId: string, emoji: unknown, userId: string)
 	{
 		return this._rest.delete<void>(`${this.route}/messages/${msgId}/reactions/${emoji}/${userId}`);
 	}
 
-	public getReactions(msgId: string, emoji: unknown): Promise<UserRes>
+	public getReactions(msgId: string, emoji: unknown)
 	{
-		return this._rest.get<UserRes>(`${this.route}/messages/${msgId}/reactions/${emoji}`);
+		return this._rest.get<APIUser>(`${this.route}/messages/${msgId}/reactions/${emoji}`);
 	}
 
-	public deleteAllReactions(msgId: string): Promise<void>
+	public deleteAllReactions(msgId: string)
 	{
 		return this._rest.delete<void>(`${this.route}/messages/${msgId}/reactions`);
 	}
 
-	public deleteAllReactionsForEmoji(msgId: string, emoji: unknown): Promise<void>
+	public deleteAllReactionsForEmoji(msgId: string, emoji: unknown)
 	{
 		return this._rest.delete<void>(`${this.route}/messages/${msgId}/reactions/${emoji}`);
 	}
 	//#endregion
 
 	//#region Invites
-	public createInvite(opts?: SomeObject): Promise<Invite>
+	public createInvite(opts?: SomeObject)
 	{
-		return this._rest.post<Invite>(`${this.route}/invites`, opts);
+		return this._rest.post<APIInvite>(`${this.route}/invites`, opts);
 	}
 
-	public getInvites(): Promise<Invite[]>
+	public getInvites()
 	{
-		return this._rest.get<Invite[]>(`${this.route}/invites`);
+		return this._rest.get<APIInvite[]>(`${this.route}/invites`);
 	}
 	//#endregion
 
 	//#region Permissions
-	public createPermissions(overrideId: string, opts: SomeObject): Promise<void>
+	public createPermissions(overrideId: string, opts: SomeObject)
 	{
 		return this._rest.put<void>(`${this.route}/permissions/${overrideId}`, opts);
 	}
 	
-	public editPermissions(overrideId: string, opts: SomeObject): Promise<void>
+	public editPermissions(overrideId: string, opts: SomeObject)
 	{
 		return this._rest.put<void>(`${this.route}/permissions/${overrideId}`, opts);
 	}
 	
-	public deletePermissions(overrideId: string): Promise<void>
+	public deletePermissions(overrideId: string)
 	{
 		return this._rest.put<void>(`${this.route}/permissions/${overrideId}`);
 	}
 	//#endregion
 
 	//#region Misc
-	public triggerTypingIndicator(): Promise<void>
+	public triggerTypingIndicator()
 	{
 		return this._rest.post<void>(`${this.route}/typing`);
 	}
@@ -166,12 +172,12 @@ export class RestGroupChannel extends RestChannel
 	}
 	
 	//#region Group DM options
-	public groupDmAddRecipient(id: string, opts?: SomeObject): Promise<void>
+	public groupDmAddRecipient(id: string, opts?: SomeObject)
 	{
 		return this._rest.put<void>(`${this.route}/recipients/${id}`, opts);
 	}
 
-	public groupDmRemoveRecipient(id: string): Promise<void>
+	public groupDmRemoveRecipient(id: string)
 	{
 		return this._rest.delete<void>(`${this.route}/recipients/${id}`);
 	}
