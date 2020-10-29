@@ -1,6 +1,0 @@
-{
-	"scripts": {
-		"lint": "deno lint --unstable ./src/",
-		"test": "deno run --allow-net --allow-read --allow-env --config ./tsconfig.json test/bot.ts"
-	}
-}

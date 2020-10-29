@@ -1,3 +1,3 @@
-export * from "./src/rest/mod.ts";
-export * from "./src/socket/mod.ts";
-export * from "./src/typings/mod.ts";
+export * from "./src/gateway.ts";
+export * from "./src/rest.ts";
+export * from "./src/types.ts";
